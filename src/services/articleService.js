@@ -121,7 +121,11 @@ export async function getPopularArticles(limit = 5, locale = 'bn') {
       'locale': strapiLocale,
     });
 
-    return await fetchAPI(`/articles?${queryParams}`);
+    const response = await fetchAPI(`/articles?${queryParams}`);
+    if (!response?.data || response.data.length === 0) {
+      return getLatestArticles(1, limit, locale);
+    }
+    return response;
   } catch (error) {
     return getLatestArticles(1, limit, locale);
   }
@@ -139,7 +143,11 @@ export async function getMostViewedArticles(limit = 5, locale = 'bn') {
       'locale': strapiLocale,
     });
 
-    return await fetchAPI(`/articles?${queryParams}`);
+    const response = await fetchAPI(`/articles?${queryParams}`);
+    if (!response?.data || response.data.length === 0) {
+      return getLatestArticles(1, limit, locale);
+    }
+    return response;
   } catch (error) {
     return getLatestArticles(1, limit, locale);
   }
@@ -235,4 +243,21 @@ export async function getArticlesByCategoryEnhanced(categorySlug, limit = 10, op
   });
 
   return await fetchAPI(`/articles?${queryParams}`);
+}
+
+
+export async function incrementViewCount(articleId, currentViews) {
+  try {
+    return await fetchAPI(`/articles/${articleId}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        data: {
+          viewCount: (currentViews || 0) + 1,
+        },
+      }),
+    });
+  } catch (error) {
+    console.error('Error incrementing view count:', error);
+    return null;
+  }
 }

@@ -3,7 +3,12 @@ import { fetchAPI, getStrapiLocale } from '@/lib/strapi';
 
 export async function getGlobalSettings(locale = 'bn') {
   const strapiLocale = getStrapiLocale(locale);
-  return fetchAPI(`/global?populate=*&locale=${strapiLocale}`);
+  try {
+    return await fetchAPI(`/global?populate=*&locale=${strapiLocale}`);
+  } catch (error) {
+    console.warn("getGlobalSettings failed. Returning empty.", error);
+    return { data: null };
+  }
 }
 
 export async function getAuthors(locale = 'bn') {

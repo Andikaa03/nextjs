@@ -97,11 +97,16 @@ const ArticleDetailPage = () => {
   useEffect(() => {
     async function fetchSidebarData() {
       try {
-        const [mvResponse, popResponse, globalData] = await Promise.all([
+        const results = await Promise.allSettled([
           getMostViewedArticles(5, locale),
           getPopularArticles(5, locale),
           getGlobalSettings(locale),
         ]);
+        
+        const mvResponse = results[0].status === 'fulfilled' ? results[0].value : null;
+        const popResponse = results[1].status === 'fulfilled' ? results[1].value : null;
+        const globalData = results[2].status === 'fulfilled' ? results[2].value : null;
+
         setMostViewed(mvResponse?.data || []);
         setPopular(popResponse?.data || []);
         setGlobalSettings(globalData?.data || null);
@@ -230,7 +235,7 @@ const ArticleDetailPage = () => {
                   {/* Custom Header Layout matching reference */}
                   <div className="mb-4">
                      {/* Breadcrumb */}
-                     <nav aria-label="breadcrumb" className="mb-3">
+                     <nav aria-label="breadcrumb" className="mb-3 d-none d-md-block">
                       <ol className="breadcrumb d-inline-block bg-transparent p-0 m-0">
                         <li className="breadcrumb-item">
                           <Link href={`/${language}`} className="text-danger"><i className="fas fa-home"></i> {currentT.home}</Link>

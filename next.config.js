@@ -30,6 +30,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'shottyodharaprotidin-media.s3.ap-southeast-2.amazonaws.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'media.shottyodharaprotidin.com',
       }
     ],
   },
