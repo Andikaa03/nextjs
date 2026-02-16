@@ -233,36 +233,74 @@ const Header = () => {
                         </div>
                     </div>
                     {/* /. End Fullscreen Search */}
+
+                    {/* MOBILE TOP ROW: Burger, Logo, Icons (Hidden on Desktop) */}
+                    <div className="container d-md-none border-bottom py-2">
+                        <div className="d-flex align-items-center justify-content-between w-100">
+                            {/* Mobile Burger Menu Icon */}
+                            <div id="nav-icon-mobile" className={isSidebarActive ? 'open' : ''} onClick={toggleSidebar}>
+                                <span />
+                                <span />
+                                <span />
+                            </div>
+
+                            {/* Mobile Logo */}
+                            <Link className="navbar-brand-mobile" href={`/${language}`}>
+                                <Image
+                                    src="/logo-white.png"
+                                    className="img-fluid logo-light-img"
+                                    alt={globalSettings?.siteName || 'Logo'}
+                                    width={150}
+                                    height={40}
+                                    priority
+                                />
+                                <Image
+                                    src="/logo-dark.png"
+                                    className="img-fluid logo-dark-img"
+                                    alt={globalSettings?.siteName || 'Logo'}
+                                    width={150}
+                                    height={40}
+                                    priority
+                                />
+                            </Link>
+
+                            {/* Mobile Right Icons (Language, Theme, Search) */}
+                            <div className="d-flex align-items-center gap-2">
+                                <div className="language-toggle d-flex gap-1 align-items-center me-1">
+                                    <button 
+                                        className={`btn btn-sm ${language === 'bn' ? 'btn-danger' : 'btn-outline-secondary'}`}
+                                        onClick={() => language !== 'bn' && toggleLanguage()}
+                                        style={{ fontSize: '10px', padding: '2px 5px' }}
+                                    >
+                                        বাংলা
+                                    </button>
+                                    <button 
+                                        className={`btn btn-sm ${language === 'en' ? 'btn-danger' : 'btn-outline-secondary'}`}
+                                        onClick={() => language !== 'en' && toggleLanguage()}
+                                        style={{ fontSize: '10px', padding: '2px 5px' }}
+                                    >
+                                        EN
+                                    </button>
+                                </div>
+                                <ThemeChanger />
+                                <button
+                                    type="button"
+                                    className="btn btn-search_two p-0"
+                                    onClick={handleSearchButtonClick}
+                                    aria-label="Search"
+                                >
+                                    <i className="fa fa-search" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* CATEGORY & DESKTOP ROW */}
                     <div className="container position-relative">
-                        {/* Start Navbar Brand*/}
-                        <Link className="navbar-brand d-md-none" href={`/${language}`}>
-                            <Image
-                                src="/logo-white.png"
-                                className="img-fluid logo-light-img"
-                                alt={globalSettings?.siteName || 'Logo'}
-                                width={251}
-                                height={67}
-                                priority
-                            />
-                            <Image
-                                src="/logo-dark.png"
-                                className="img-fluid logo-dark-img"
-                                alt={globalSettings?.siteName || 'Logo'}
-                                width={251}
-                                height={67}
-                                priority
-                            />
-                        </Link>
-                        {/* End Navbar Brand*/}
-                        {/* Start Search Button */}
-                        {/* Search Button moved to end on mobile */}
-                          
-                        {/* End Search Button */}
-                        {/* Start Navbar Toggler Buton */}
-                        {/* Remove Navbar Toggler Button as we want it always visible and scrollable */}
-                        {/* End Navbar Toggler Buton */}
+                        {/* Desktop Navbar Brand (Removed logo as it's already in header-mid) */}
+                        <div className="navbar-brand d-none d-md-block"></div>
+
                         <div className="navbar-nav-container" id="navbarSupportedContent">
-                            {/* Removed mobile header from inside the scrollable nav */}
                             <ul className="navbar-nav">
                                 {/* প্রথম পাতা (Home) */}
                                 <li className="nav-item">
@@ -270,11 +308,18 @@ const Header = () => {
                                         {currentT.home}
                                     </Link>
                                 </li>
+
+                                {/* ই-পেপার (E-Paper) - Moved to front for mobile visibility */}
+                                <li className="nav-item">
+                                    <Link className={`nav-link ${path === `/${language}/epaper` ? 'active' : ''}`} href={`/${language}/epaper`}>
+                                        {currentT.epaper}
+                                    </Link>
+                                </li>
                                 
                                 {/* Dynamic Categories from Strapi */}
                                 {loading && (
                                     <>
-                                        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                                        {[1, 2, 3].map((i) => (
                                             <li key={`skeleton-${i}`} className="nav-item">
                                                 <a className="nav-link">
                                                     <div className="skeleton-loader" style={{ width: '80px', height: '20px', backgroundColor: 'rgba(255,255,255,0.2)' }}></div>
@@ -294,17 +339,11 @@ const Header = () => {
                                         </Link>
                                     </li>
                                 ))}
-                                
-                                {/* ই-পেপার (E-Paper) */}
-                                <li className="nav-item">
-                                    <Link className={`nav-link ${path === `/${language}/epaper` ? 'active' : ''}`} href={`/${language}/epaper`}>
-                                        {currentT.epaper}
-                                    </Link>
-                                </li>
-                               
                             </ul>
                         </div>
-                        <div className="d-flex align-items-center flex-nowrap ms-auto gap-2">
+
+                        {/* Desktop Actions (Hidden on Mobile) */}
+                        <div className="d-none d-md-flex align-items-center flex-nowrap ms-auto gap-2">
                             <div className="language-toggle d-flex gap-1 align-items-center me-2">
                                 <button 
                                     className={`btn btn-sm ${language === 'bn' ? 'btn-danger' : 'btn-outline-secondary'}`}
@@ -331,7 +370,6 @@ const Header = () => {
                                 <i className="fa fa-search" />
                             </button>
                         </div>
-                        {/* End Color Change Button */}
                     </div>
                 </nav>
                 {/* END OF/. NAVIGATION */}
