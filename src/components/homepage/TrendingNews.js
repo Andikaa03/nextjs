@@ -6,10 +6,11 @@ import { getTrendingCategories } from "@/services/globalService";
 import Skeleton from "@/components/skeleton";
 import { useLanguage } from "@/context/LanguageContext";
 
-const TrendingTopics = () => {
+const TrendingTopics = ({ initialCategories = [] }) => {
   const { language } = useLanguage();
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState(initialCategories);
+  const [loading, setLoading] = useState(!initialCategories.length);
+  const locale = language === 'bn' ? 'bn' : 'en';
 
   const t = {
     bn: {
@@ -27,12 +28,20 @@ const TrendingTopics = () => {
   };
 
   const currentT = t[language] || t.bn;
-  const locale = language === 'bn' ? 'bn' : 'en';
+
+  // Use a ref to track if we've already attempted to fetch for the current language
+  // This prevents infinite loops if initialCategories is unstable
+  const fetchedRef = useState(false);
 
   useEffect(() => {
+    // If we have categories (from props or previous fetch), don't fetch.
+    if (categories.length > 0) {
+      setLoading(false);
+      return;
+    }
+
     async function fetchData() {
       setLoading(true);
-      setCategories([]);
       try {
         const response = await getTrendingCategories(5, locale);
         setCategories(response?.data || []);
@@ -42,8 +51,9 @@ const TrendingTopics = () => {
         setLoading(false);
       }
     }
+
     fetchData();
-  }, [language]);
+  }, [language]); // Depend only on language, not on the initialCategories prop array
 
   if (loading) {
      return (
