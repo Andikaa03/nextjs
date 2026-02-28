@@ -53,7 +53,6 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
     const [headerTopData, setHeaderTopData] = useState(null);
     const [adsData, setAdsData] = useState(null);
     const [headerLogo, setHeaderLogo] = useState(null);
-    const [headerLogoWhite, setHeaderLogoWhite] = useState(null);
     const navbarNavRef = useRef(null);
 
     const hasWeatherTemp = weather.temp !== null && weather.temp !== undefined && !Number.isNaN(Number(weather.temp));
@@ -80,7 +79,6 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
             // Extract logo from header attributes
             const attrs = res?.attributes || {};
             if (attrs.logo) setHeaderLogo(getStrapiMedia(attrs.logo));
-            if (attrs.logoWhite) setHeaderLogoWhite(getStrapiMedia(attrs.logoWhite));
         }).finally(() => {
             setIsLoadingMenu(false);
         });
@@ -442,7 +440,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
             <header>
                 {/* START HEADER TOP */}
                 <div className="header-top">
-                    <div className="container">
+                    <div className={`${hideMiddleHeader ? 'container-fluid px-4 px-lg-5' : 'container'}`}>
                         <div className="row">
                             <div className="col">
                                 {/* Start top left menu */}
@@ -455,8 +453,14 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                                 <ul className="align-items-center d-flex gap-2">
                                                     {headerTopData.socialLinks.map((item, i) => (
                                                     <li key={i}>
-                                                        <Link href={item.url} target="_blank">
-                                                            <i className={item.icon} />
+                                                        <Link href={item.url} target="_blank" className="d-flex align-items-center justify-content-center">
+                                                            {item.icon && (
+                                                                <img 
+                                                                    src={getStrapiMedia(item.icon)} 
+                                                                    alt="Social link" 
+                                                                    style={{ width: '16px', height: '16px', objectFit: 'contain' }}
+                                                                />
+                                                            )}
                                                         </Link>
                                                     </li>
                                                     ))}
@@ -467,9 +471,16 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                         )}
                                         {headerTopData?.leftMenu?.map((item, i) => (
                                         <li className="d-none d-sm-block" key={i}>
-                                            <Link href={item.url || "#"}>
-                                                {item.icon && <i className={`${item.icon} me-1`} />}
-                                                {item.label}
+                                            <Link href={item.url || "#"} className="d-flex align-items-center">
+                                                {item.icon && (
+                                                    <img 
+                                                        src={getStrapiMedia(item.icon)} 
+                                                        alt={item.label} 
+                                                        style={{ width: '16px', height: '16px', objectFit: 'contain' }}
+                                                        className="me-1" 
+                                                    />
+                                                )}
+                                                <span>{item.label}</span>
                                             </Link>
                                         </li>
                                         ))}
@@ -484,9 +495,16 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                     <ul className="d-flex justify-content-end">
                                         {headerTopData.rightMenu.map((item, i) => (
                                         <li key={i}>
-                                            <Link href={item.url || "#"}>
-                                                {item.icon && <i className={`${item.icon} me-1`} />}
-                                                {item.label}
+                                            <Link href={item.url || "#"} className="d-flex align-items-center">
+                                                {item.icon && (
+                                                    <img 
+                                                        src={getStrapiMedia(item.icon)} 
+                                                        alt={item.label} 
+                                                        style={{ width: '16px', height: '16px', objectFit: 'contain' }}
+                                                        className="me-1" 
+                                                    />
+                                                )}
+                                                <span>{item.label}</span>
                                             </Link>
                                         </li>
                                         ))}
@@ -504,19 +522,14 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
 
                 {/* START MIDDLE SECTION */}
                 {hideMiddleHeader || path.includes('/article/') ? (
-                    <div className="d-md-block d-none header-mid">
+                    <div className="d-md-block d-none header-mid pt-2 pb-2">
                         <div className="container">
                             <div className="align-items-center row">
                                 <div className="col-sm-4">
                                     <Link href="/">
                                         <img
                                             src={headerLogo || "/assets/images/logo.png"}
-                                            className="img-fluid header-logo header-logo_dark"
-                                            alt=""
-                                        />
-                                        <img
-                                            src={headerLogoWhite || "/assets/images/logo-white.png"}
-                                            className="img-fluid header-logo_white"
+                                            className="img-fluid header-logo"
                                             alt=""
                                         />
                                     </Link>
@@ -535,7 +548,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                         </div>
                     </div>
                 ) : (
-                    <div className="d-md-block d-none header-mid">
+                    <div className="d-md-block d-none header-mid pt-2 pb-2">
                         <div className="container">
                             <div className="align-items-center row justify-content-center">
                                 <div className="col">
@@ -553,8 +566,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                             {getWeatherIcon(weather.icon)} {weatherTempText}{weatherUnitText}
                                         </div>
                                         <Link href="/" className="header-logo">
-                                            <img src={headerLogo || "assets/images/logo.png"} className="header-logo_dark" alt="" />
-                                            <img src={headerLogoWhite || "assets/images/logo-white.png"} className="header-logo_white" alt="" />
+                                            <img src={headerLogo || "assets/images/logo.png"} alt="" />
                                         </Link>
                                         <div className="dropdown language-dropdown">
                                             <button className="btn p-0 dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -595,8 +607,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                     </div>
                     <div className={`${hideMiddleHeader ? 'container-fluid px-4 px-lg-5' : 'container'} position-relative`}>
                         <Link className="navbar-brand d-md-none" href="/">
-                            <img src={headerLogo || "assets/images/logo.png"} className="header-logo_dark" alt="" />
-                            <img src={headerLogoWhite || "assets/images/logo-white.png"} className="header-logo_white" alt="" />
+                            <img src={headerLogo || "assets/images/logo.png"} alt="" />
                         </Link>
                         <button type="button" className="btn btn-search_two  ms-auto ms-md-0 d-lg-none" onClick={handleSearchButtonClick}><i className="fa fa-search" /></button>
                           
@@ -607,8 +618,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                         <div className={`collapse navbar-collapse`} id="navbarSupportedContent">
                             <div className="align-items-center border-bottom d-flex d-lg-none  justify-content-between mb-3 navbar-collapse__header pb-3">
                                 <div className="collapse-brand flex-shrink-0">
-                                    <Link href="/"><img src={headerLogo || "assets/images/logo.png"} className="header-logo_dark" alt="" /></Link>
-                                    <Link href="/"><img src={headerLogoWhite || "assets/images/logo-white.png"} className="header-logo_white" alt="" /></Link>
+                                    <Link href="/"><img src={headerLogo || "assets/images/logo.png"} alt="" /></Link>
                                 </div>
                                 <div className="flex-grow-1 ms-3 text-end">
                                     <button type="button" className="bg-transparent border-0 collapse-close p-0 position-relative" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
