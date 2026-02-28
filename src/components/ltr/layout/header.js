@@ -530,7 +530,8 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                         <img
                                             src={headerLogo || "/assets/images/logo.png"}
                                             className="img-fluid header-logo"
-                                            alt=""
+                                            alt="Logo"
+                                            style={{ width: '250px', height: '60px', objectFit: 'contain' }}
                                         />
                                     </Link>
                                 </div>
@@ -566,7 +567,11 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                             {getWeatherIcon(weather.icon)} {weatherTempText}{weatherUnitText}
                                         </div>
                                         <Link href="/" className="header-logo">
-                                            <img src={headerLogo || "assets/images/logo.png"} alt="" />
+                                            <img 
+                                                src={headerLogo || "assets/images/logo.png"} 
+                                                alt="Logo" 
+                                                style={{ width: '180px', height: '45px', objectFit: 'contain' }}
+                                            />
                                         </Link>
                                         <div className="dropdown language-dropdown">
                                             <button className="btn p-0 dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -607,7 +612,11 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                     </div>
                     <div className={`${hideMiddleHeader ? 'container-fluid px-4 px-lg-5' : 'container'} position-relative`}>
                         <Link className="navbar-brand d-md-none" href="/">
-                            <img src={headerLogo || "assets/images/logo.png"} alt="" />
+                            <img 
+                                src={headerLogo || "assets/images/logo.png"} 
+                                alt="Logo" 
+                                style={{ width: '150px', height: '40px', objectFit: 'contain' }}
+                            />
                         </Link>
                         <button type="button" className="btn btn-search_two  ms-auto ms-md-0 d-lg-none" onClick={handleSearchButtonClick}><i className="fa fa-search" /></button>
                           
@@ -618,7 +627,13 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                         <div className={`collapse navbar-collapse`} id="navbarSupportedContent">
                             <div className="align-items-center border-bottom d-flex d-lg-none  justify-content-between mb-3 navbar-collapse__header pb-3">
                                 <div className="collapse-brand flex-shrink-0">
-                                    <Link href="/"><img src={headerLogo || "assets/images/logo.png"} alt="" /></Link>
+                                    <Link href="/">
+                                        <img 
+                                            src={headerLogo || "assets/images/logo.png"} 
+                                            alt="Logo" 
+                                            style={{ width: '150px', height: '40px', objectFit: 'contain' }}
+                                        />
+                                    </Link>
                                 </div>
                                 <div className="flex-grow-1 ms-3 text-end">
                                     <button type="button" className="bg-transparent border-0 collapse-close p-0 position-relative" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
