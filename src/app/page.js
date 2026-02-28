@@ -10,9 +10,9 @@ import HomeFeatureCarousal from "@/components/ltr/home-feature-carousal/home-fea
 import HomeCenterSlider from "@/components/ltr/home-center-slider/home-center-slider";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getFeaturedArticles, getPopularArticles, getTrendingNews, getLatestArticles, getReviewArticles, getArticlesByCategory, getEditorPicks } from "@/services/articleService";
+import { getTopNewsArticles, getHeadlineArticles, getTopSliderArticles, getMiddleSliderArticles, getMostReadArticles, getPopularNewsArticles, getTechInnovationArticles, getEditorChoiceArticles, getRecentPostArticles, getRecentReviewArticles, getLatestArticles, getArticlesByCategory } from "@/services/articleService";
 import { getYoutubeVideos, getActivePoll } from "@/services/mediaService";
-import { getGlobalSettings, getTags, getCategories, getAdsManagement } from "@/services/globalService";
+import { getGlobalSettings, getTags, getCategories, getTrendingCategories, getAdsManagement } from "@/services/globalService";
 import { getWeatherForecast } from "@/services/weatherService";
 import { resolveClientLocation } from "@/services/locationService";
 import { getStrapiMedia, formatDate, toBengaliNumber } from "@/lib/strapi";
@@ -37,6 +37,7 @@ const getArt = (article, locale = 'bn') => {
     date: d.createdAt || d.publishedAt || new Date().toISOString(),
     excerpt: d.excerpt || '',
     videoUrl: d.videoUrl || null,
+    rating: d.rating || null,
     id: article?.id || 0,
   };
 };
@@ -142,6 +143,9 @@ export default function Home() {
   const [popular, setPopular] = useState([]);
   const [trending, setTrending] = useState([]);
   const [latest, setLatest] = useState([]);
+  const [topNews, setTopNews] = useState([]);
+  const [mostRead, setMostRead] = useState([]);
+  const [popularNews, setPopularNews] = useState([]);
   const [youtubeData, setYoutubeData] = useState([]);
   const [pollData, setPollData] = useState(null);
   const [globalSettings, setGlobalSettings] = useState(null);
@@ -151,6 +155,7 @@ export default function Home() {
   const [latestReviews, setLatestReviews] = useState([]);
   const [adsData, setAdsData] = useState(null);
   const [categories, setCategories] = useState([]);
+  const [trendingCategories, setTrendingCategories] = useState([]);
   const [weatherData, setWeatherData] = useState({
     currentTemp: null,
     apparentTemp: null,
@@ -222,6 +227,9 @@ export default function Home() {
   const displayPopular = isInitialLoading ? dummyArticles : popular;
   const displayTrending = isInitialLoading ? dummyArticles : trending;
   const displayLatest = isInitialLoading ? dummyArticles : latest;
+  const displayTopNews = isInitialLoading ? dummyArticles : topNews;
+  const displayMostRead = isInitialLoading ? dummyArticles : mostRead;
+  const displayPopularNews = isInitialLoading ? dummyArticles : popularNews;
   const displayTech = isInitialLoading ? dummyArticles : techArticles;
   const displayEditor = isInitialLoading ? dummyArticles : editorPicks;
   const displayReviews = isInitialLoading ? dummyArticles : latestReviews;
@@ -269,44 +277,57 @@ export default function Home() {
         const weatherLon = resolvedLocation?.lon;
         const detectedLocationLabel = resolvedLocation?.fallbackLabel || '';
 
-        const [featuredRes, popularRes, trendingRes, latestRes] = await Promise.allSettled([
-          getFeaturedArticles(10, locale),
-          getPopularArticles(10, locale),
-          getTrendingNews(15, locale),
+        const [topSliderRes, middleSliderRes, headlineRes, latestRes] = await Promise.allSettled([
+          getTopSliderArticles(10, locale),
+          getMiddleSliderArticles(10, locale),
+          getHeadlineArticles(15, locale),
           getLatestArticles(1, 20, locale),
         ]);
 
-        setFeatured(featuredRes.value?.data || []);
-        setPopular(popularRes.value?.data || []);
-        setTrending(trendingRes.value?.data || []);
+        setFeatured(topSliderRes.value?.data || []);
+        setPopular(middleSliderRes.value?.data || []);
+        setTrending(headlineRes.value?.data || []);
         setLatest(latestRes.value?.data || []);
         setTotalPages(latestRes.value?.meta?.pagination?.pageCount || 1);
 
         releaseSkeleton();
 
-        const [youtubeRes, pollRes, globalRes, tagsRes, techRes, editorRes, reviewRes, categoriesRes, adsRes, weatherRes] = await Promise.allSettled([
+        const [youtubeRes, pollRes, globalRes, tagsRes, topNewsRes, mostReadRes, popularNewsRes, techRes, editorRes, recentPostRes, reviewRes, categoriesRes, trendingRes, adsRes, weatherRes] = await Promise.allSettled([
           getYoutubeVideos(locale),
           getActivePoll(locale),
           getGlobalSettings(locale),
           getTags(10, locale),
-          getArticlesByCategory('technology', 4, locale),
-          getEditorPicks(5, locale),
-          getReviewArticles(7, locale),
+          getTopNewsArticles(5, locale),
+          getMostReadArticles(10, locale),
+          getPopularNewsArticles(10, locale),
+          getTechInnovationArticles(4, locale),
+          getEditorChoiceArticles(5, locale),
+          getRecentPostArticles(20, locale),
+          getRecentReviewArticles(7, locale),
           getCategories(10, locale),
+          getTrendingCategories(10, locale),
           getAdsManagement(),
           getWeatherForecast(weatherLat, weatherLon, locale),
         ]);
 
         setYoutubeData(youtubeRes.value?.data || []);
-        setPollData(pollRes.value?.data?.[0] || null); // Poll returns array, take first
+        setPollData(pollRes.value?.data?.[0] || null);
         const globalRaw = globalRes.value?.data || globalRes.value || null;
         const globalData = globalRaw?.attributes || globalRaw;
         setGlobalSettings(globalData);
         setTags(tagsRes.value?.data || []);
+        setTopNews(topNewsRes.value?.data || []);
+        setMostRead(mostReadRes.value?.data || []);
+        setPopularNews(popularNewsRes.value?.data || []);
         setTechArticles(techRes.value?.data || []);
         setEditorPicks(editorRes.value?.data || []);
+        setLatest(prev => {
+          const recentPostData = recentPostRes.value?.data;
+          return (recentPostData && recentPostData.length > 0) ? recentPostData : prev;
+        });
         setLatestReviews(reviewRes.value?.data || []);
         setCategories(categoriesRes.value?.data || []);
+        setTrendingCategories(trendingRes.value?.data || []);
         const adsRaw = adsRes.value?.data || adsRes.value || null;
         setAdsData(adsRaw);
         if (weatherRes.status === 'fulfilled' && weatherRes.value) {
@@ -444,7 +465,7 @@ export default function Home() {
                 </div>
                 <div className="border-bottom posts">
                   <ul>
-                    {(displayTrending.length > 0 ? displayTrending.slice(0, 3) : []).map((article, i) => {
+                    {(displayTopNews.length > 0 ? displayTopNews.slice(0, 3) : []).map((article, i) => {
                       const a = getArt(article, locale);
                       return (
                         <li key={a.id || `ts-${i}`} className={`${i === 2 ? 'd-none d-xl-block ' : ''}post-grid`}>
@@ -481,7 +502,7 @@ export default function Home() {
                     <div className="tab-pane fade show active" id="most-viewed-pane" role="tabpanel" aria-labelledby="most-viewed" tabIndex={0}>
                       <div className="most-viewed">
                         <ul id="most-today" className="content tabs-content">
-                          {(displayPopular.length > 0 ? displayPopular.slice(0, 5) : []).map((article, i) => {
+                          {(displayMostRead.length > 0 ? displayMostRead.slice(0, 5) : []).map((article, i) => {
                             const a = getArt(article, locale);
                             return (
                               <li key={a.id || `mv-${i}`}>
@@ -497,7 +518,7 @@ export default function Home() {
                     </div>
                     <div className="tab-pane fade" id="popular-news-pane" role="tabpanel" aria-labelledby="popular-news" tabIndex={0}>
                       <div className="popular-news">
-                        {(displayPopular.length > 0 ? displayPopular.slice(5, 8) : []).map((article, i) => {
+                        {(displayPopularNews.length > 0 ? displayPopularNews.slice(0, 5) : []).map((article, i) => {
                           const a = getArt(article, locale);
                           return (
                             <div key={a.id || `pn-${i}`} className="p-post">
@@ -505,13 +526,13 @@ export default function Home() {
                               <ul className="authar-info d-flex flex-wrap justify-content-center">
                                 <li className="date"><i className="ti ti ti-timer" /> {fmtDate(a.date, locale)}</li>
                               </ul>
+                              {a.rating > 0 && (
                               <div className="reatting-2">
-                                <i className="fas fa-star" />
-                                <i className="fas fa-star" />
-                                <i className="fas fa-star" />
-                                <i className="fas fa-star-half-alt" />
-                                <i className="far fa-star" />
+                                {[1,2,3,4,5].map(star => (
+                                  <i key={star} className={`fas ${a.rating >= star ? 'fa-star' : a.rating >= star - 0.5 ? 'fa-star-half-alt' : 'far fa-star'}`} />
+                                ))}
                               </div>
+                              )}
                             </div>
                           );
                         })}
@@ -654,12 +675,13 @@ export default function Home() {
                     <h4><strong>{t.trendingTopics}</strong></h4>
                   </div>
                   <div className="panel_body">
-                    {(categories.length > 0 ? categories.slice(0, 5) : (loading ? Array(5).fill(null) : [])).map((cat, i) => {
+                    {(trendingCategories.length > 0 ? trendingCategories.slice(0, 5) : (categories.length > 0 ? categories.slice(0, 5) : (loading ? Array(5).fill(null) : []))).map((cat, i) => {
                       const catData = cat?.attributes || cat;
                       const slug = catData?.slug || '#';
                       const name = catData?.name || '...';
+                      const catImage = getStrapiMedia(catData?.featuredImage) || '/default.jpg';
                       return (
-                        <div key={cat?.id || `tt-${i}`} className="text-center mb-2 card-bg-scale position-relative overflow-hidden bg-dark-overlay bg-img p-3" data-image-src={'/default.jpg'}>
+                        <div key={cat?.id || `tt-${i}`} className="text-center mb-2 card-bg-scale position-relative overflow-hidden bg-dark-overlay bg-img p-3" data-image-src={catImage}>
                           <Link href={slug !== '#' ? `/category/${slug}` : '#'} className="btn-link fs-5 fw-bold stretched-link text-decoration-none text-white">
                             {name}
                           </Link>
@@ -690,9 +712,13 @@ export default function Home() {
                           <Link href={a.slug !== '#' ? `/article/${a.slug}` : '#'} className="news-image">
                             <img src={a.image} alt={a.title} className="img-fluid w-100" onError={(e) => e.target.src = '/default.jpg'} />
                           </Link>
+                          {a.rating > 0 && (
                           <div className="reatting">
-                            <i className="fa fa-star" /><i className="fa fa-star" /><i className="fa fa-star" /><i className="fa fa-star-half-o" /><i className="fa fa-star-o" />
+                            {[1,2,3,4,5].map(star => (
+                              <i key={star} className={a.rating >= star ? 'fa fa-star' : a.rating >= star - 0.5 ? 'fa fa-star-half-o' : 'fa fa-star-o'} />
+                            ))}
                           </div>
+                          )}
                           <div className="post-text">
                             <ul className="align-items-center authar-info d-flex flex-wrap gap-1 mb-1">
                               <li><span className="post-category mb-0">{a.category}</span></li>
@@ -716,9 +742,13 @@ export default function Home() {
                             </div>
                             <div className="post-info-2">
                               <h5><Link href={a.slug !== '#' ? `/article/${a.slug}` : '#'} className="title">{a.title}</Link></h5>
+                              {a.rating > 0 && (
                               <div className="reviews-reatting">
-                                <i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star-half-alt" /><i className="far fa-star" />
+                                {[1,2,3,4,5].map(star => (
+                                  <i key={star} className={`fas ${a.rating >= star ? 'fa-star' : a.rating >= star - 0.5 ? 'fa-star-half-alt' : 'far fa-star'}`} />
+                                ))}
                               </div>
+                              )}
                             </div>
                           </div>
                         );

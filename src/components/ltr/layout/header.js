@@ -52,6 +52,8 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
 
     const [headerTopData, setHeaderTopData] = useState(null);
     const [adsData, setAdsData] = useState(null);
+    const [headerLogo, setHeaderLogo] = useState(null);
+    const [headerLogoWhite, setHeaderLogoWhite] = useState(null);
     const navbarNavRef = useRef(null);
 
     const hasWeatherTemp = weather.temp !== null && weather.temp !== undefined && !Number.isNaN(Number(weather.temp));
@@ -75,6 +77,10 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
         setIsLoadingMenu(true);
         getMenuItems('header', locale).then(res => {
             setMenuItems(res?.data || []);
+            // Extract logo from header attributes
+            const attrs = res?.attributes || {};
+            if (attrs.logo) setHeaderLogo(getStrapiMedia(attrs.logo));
+            if (attrs.logoWhite) setHeaderLogoWhite(getStrapiMedia(attrs.logoWhite));
         }).finally(() => {
             setIsLoadingMenu(false);
         });
@@ -442,88 +448,48 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                 {/* Start top left menu */}
                                 <div className="d-flex top-left-menu">
                                     <ul className="align-items-center d-flex flex-wrap">
+                                        {headerTopData?.socialLinks?.length > 0 && (
                                         <li>
                                             {/* Start header social */}
                                             <div className="header-social">
                                                 <ul className="align-items-center d-flex gap-2">
-                                                    {headerTopData?.socialFacebookUrl && (
-                                                    <li>
-                                                        <Link href={headerTopData.socialFacebookUrl} target="_blank">
-                                                            <i className="fab fa-facebook-f" />
+                                                    {headerTopData.socialLinks.map((item, i) => (
+                                                    <li key={i}>
+                                                        <Link href={item.url} target="_blank">
+                                                            <i className={item.icon} />
                                                         </Link>
                                                     </li>
-                                                    )}
-                                                    {headerTopData?.socialTwitterUrl && (
-                                                    <li>
-                                                        <Link href={headerTopData.socialTwitterUrl} target="_blank">
-                                                            <i className="fab fa-twitter" />
-                                                        </Link>
-                                                    </li>
-                                                    )}
-                                                    {headerTopData?.socialVkUrl && (
-                                                    <li>
-                                                        <Link href={headerTopData.socialVkUrl} target="_blank">
-                                                            <i className="fab fa-vk" />
-                                                        </Link>
-                                                    </li>
-                                                    )}
-                                                    {headerTopData?.socialInstagramUrl && (
-                                                    <li>
-                                                        <Link href={headerTopData.socialInstagramUrl} target="_blank">
-                                                            <i className="fab fa-instagram" />
-                                                        </Link>
-                                                    </li>
-                                                    )}
-                                                    {headerTopData?.socialYoutubeUrl && (
-                                                    <li>
-                                                        <Link href={headerTopData.socialYoutubeUrl} target="_blank">
-                                                            <i className="fab fa-youtube" />
-                                                        </Link>
-                                                    </li>
-                                                    )}
-                                                    {headerTopData?.socialVimeoUrl && (
-                                                    <li>
-                                                        <Link href={headerTopData.socialVimeoUrl} target="_blank">
-                                                            <i className="fab fa-vimeo-v" />
-                                                        </Link>
-                                                    </li>
-                                                    )}
+                                                    ))}
                                                 </ul>
                                             </div>
                                             {/* End of /. header social */}
                                         </li>
-                                        {headerTopData?.contactLabel && (
-                                        <li className="d-none d-sm-block">
-                                            <Link href={headerTopData?.contactUrl || "#"}>{headerTopData.contactLabel}</Link>
-                                        </li>
                                         )}
-                                        {headerTopData?.donationLabel && (
-                                        <li className="d-none d-sm-block">
-                                            <Link href={headerTopData?.donationUrl || "#"}>{headerTopData.donationLabel}</Link>
+                                        {headerTopData?.leftMenu?.map((item, i) => (
+                                        <li className="d-none d-sm-block" key={i}>
+                                            <Link href={item.url || "#"}>
+                                                {item.icon && <i className={`${item.icon} me-1`} />}
+                                                {item.label}
+                                            </Link>
                                         </li>
-                                        )}
+                                        ))}
                                     </ul>
                                 </div>
                                 {/* End of /. top left menu */}
                             </div>
                             {/* Start header top right menu */}
-                            {(headerTopData?.signUpLabel || headerTopData?.loginLabel) && (
+                            {headerTopData?.rightMenu?.length > 0 && (
                             <div className="col-auto ms-auto">
                                 <div className="header-right-menu">
                                     <ul className="d-flex justify-content-end">
-                                        <li>
-                                            {headerTopData?.signUpLabel && (
-                                            <Link href={headerTopData?.signUpUrl || "#"}>
-                                                <i className="fa fa-lock" /> {headerTopData.signUpLabel}{" "}
+                                        {headerTopData.rightMenu.map((item, i) => (
+                                        <li key={i}>
+                                            <Link href={item.url || "#"}>
+                                                {item.icon && <i className={`${item.icon} me-1`} />}
+                                                {item.label}
                                             </Link>
-                                            )}
-                                            {headerTopData?.signUpLabel && headerTopData?.loginLabel && (
-                                            <span className="fw-bold">{headerTopData?.orLabel || "or"}</span>
-                                            )}
-                                            {headerTopData?.loginLabel && (
-                                            <Link href={headerTopData?.loginUrl || "#"}> {headerTopData.loginLabel}</Link>
-                                            )}
                                         </li>
+                                        ))}
                                     </ul>
                                 </div>
                             </div>
@@ -544,12 +510,12 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                 <div className="col-sm-4">
                                     <Link href="/">
                                         <img
-                                            src="/assets/images/logo.png"
+                                            src={headerLogo || "/assets/images/logo.png"}
                                             className="img-fluid header-logo header-logo_dark"
                                             alt=""
                                         />
                                         <img
-                                            src="/assets/images/logo-white.png"
+                                            src={headerLogoWhite || "/assets/images/logo-white.png"}
                                             className="img-fluid header-logo_white"
                                             alt=""
                                         />
@@ -587,8 +553,8 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                             {getWeatherIcon(weather.icon)} {weatherTempText}{weatherUnitText}
                                         </div>
                                         <Link href="/" className="header-logo">
-                                            <img src="assets/images/logo.png" className="header-logo_dark" alt="" />
-                                            <img src="assets/images/logo-white.png" className="header-logo_white" alt="" />
+                                            <img src={headerLogo || "assets/images/logo.png"} className="header-logo_dark" alt="" />
+                                            <img src={headerLogoWhite || "assets/images/logo-white.png"} className="header-logo_white" alt="" />
                                         </Link>
                                         <div className="dropdown language-dropdown">
                                             <button className="btn p-0 dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -627,10 +593,10 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                             </form>
                         </div>
                     </div>
-                    <div className="container position-relative">
+                    <div className={`${hideMiddleHeader ? 'container-fluid px-4 px-lg-5' : 'container'} position-relative`}>
                         <Link className="navbar-brand d-md-none" href="/">
-                            <img src="assets/images/logo.png" className="header-logo_dark" alt="" />
-                            <img src="assets/images/logo-white.png" className="header-logo_white" alt="" />
+                            <img src={headerLogo || "assets/images/logo.png"} className="header-logo_dark" alt="" />
+                            <img src={headerLogoWhite || "assets/images/logo-white.png"} className="header-logo_white" alt="" />
                         </Link>
                         <button type="button" className="btn btn-search_two  ms-auto ms-md-0 d-lg-none" onClick={handleSearchButtonClick}><i className="fa fa-search" /></button>
                           
@@ -641,8 +607,8 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                         <div className={`collapse navbar-collapse`} id="navbarSupportedContent">
                             <div className="align-items-center border-bottom d-flex d-lg-none  justify-content-between mb-3 navbar-collapse__header pb-3">
                                 <div className="collapse-brand flex-shrink-0">
-                                    <Link href="/"><img src="assets/images/logo.png" className="header-logo_dark" alt="" /></Link>
-                                    <Link href="/"><img src="assets/images/logo-white.png" className="header-logo_white" alt="" /></Link>
+                                    <Link href="/"><img src={headerLogo || "assets/images/logo.png"} className="header-logo_dark" alt="" /></Link>
+                                    <Link href="/"><img src={headerLogoWhite || "assets/images/logo-white.png"} className="header-logo_white" alt="" /></Link>
                                 </div>
                                 <div className="flex-grow-1 ms-3 text-end">
                                     <button type="button" className="bg-transparent border-0 collapse-close p-0 position-relative" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">

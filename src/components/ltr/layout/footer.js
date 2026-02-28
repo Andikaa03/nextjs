@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import ScrollToTopUI from '../scroll-to-top/scroll-to-top';
 import { useBackgroundImageLoader } from '../use-background-image/use-background-image';
-import { getLatestArticles } from '@/services/articleService';
+import { getRecentPostArticles } from '@/services/articleService';
 import { getCategories, getTags, getFooterData, getMenuItems, getGlobalSettings } from '@/services/globalService';
 import { getStrapiMedia, formatDate, toBengaliNumber, getStrapiLocale } from '@/lib/strapi';
 import { useLanguage } from '@/lib/LanguageContext';
@@ -93,7 +93,7 @@ const Footer = () => {
       try {
         const strapiLocale = getStrapiLocale(locale);
         const [recentRes, catRes, tagRes, footerDataRes, footerMenuRes, globalRes] = await Promise.all([
-          getLatestArticles(1, 3, strapiLocale), // Fetch 3 recent posts
+          getRecentPostArticles(3, locale), // Fetch 3 recent posts (isRecentPost=true)
           getCategories(6, locale), // Fetch 6 categories (generic)
           getTags(12, locale), // Fetch 12 tags for hot topics
           getFooterData(locale), // Fetch footer data

@@ -70,6 +70,8 @@ export async function getMenuItems(location = 'header', locale = 'bn') {
       endpoint = '/header';
       query = [
         `locale=${strapiLocale}`,
+        'populate[logo][fields][0]=url&populate[logo][fields][1]=alternativeText',
+        'populate[logoWhite][fields][0]=url&populate[logoWhite][fields][1]=alternativeText',
         'populate[menu][on][navigation.base-link][populate]=*',
         'populate[menu][on][navigation.menu-button][populate]=*',
         'populate[menu][on][navigation.dropdown-menu][populate][subMenus][on][navigation.base-link][populate]=*',
@@ -115,7 +117,7 @@ export async function getAdsManagement() {
 export async function getHeaderTop(locale = 'bn') {
   const strapiLocale = getStrapiLocale(locale);
   try {
-    return await fetchAPI(`/header-top?populate=*&locale=${strapiLocale}`, { silent: true });
+    return await fetchAPI(`/header-top?populate[socialLinks]=*&populate[leftMenu]=*&populate[rightMenu]=*&locale=${strapiLocale}`, { silent: true });
   } catch {
     return { data: null };
   }

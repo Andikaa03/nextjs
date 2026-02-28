@@ -23,12 +23,7 @@ export async function getArticleBySlug(slug, locale = 'bn') {
   const strapiLocale = getStrapiLocale(locale);
   const queryParams = new URLSearchParams({
     'filters[slug][$eq]': slug,
-    'populate[0]': 'cover',
-    'populate[1]': 'author',
-    'populate[2]': 'category',
-    'populate[3]': 'tags',
-    'populate[4]': 'blocks',
-    'populate[5]': 'seo.shareImage',
+    'populate': '*',
     'locale': strapiLocale,
   });
   const data = await fetchAPI(`/articles?${queryParams}`);
@@ -115,144 +110,49 @@ export async function getRelatedArticles(categorySlug, currentArticleId, limit =
     return await fetchAPI(`/articles?${queryParams}`);
 }
 
-export async function getFeaturedArticles(limit = 6, locale = 'bn') {
-  const strapiLocale = getStrapiLocale(locale);
-  const queryParams = new URLSearchParams({
-    'filters[isFeatured][$eq]': 'true',
-    'populate[0]': 'cover',
-    'populate[1]': 'author',
-    'populate[2]': 'category',
-    'pagination[limit]': limit,
-    'sort': 'createdAt:desc',
-    'locale': strapiLocale,
-  });
+// Helper: create a section query function that filters by a boolean flag
+function createSectionFetcher(flagName, defaultLimit = 10) {
+  return async function(limit = defaultLimit, locale = 'bn') {
+    const strapiLocale = getStrapiLocale(locale);
+    try {
+      const queryParams = new URLSearchParams({
+        [`filters[${flagName}][$eq]`]: 'true',
+        'populate[0]': 'cover',
+        'populate[1]': 'author',
+        'populate[2]': 'category',
+        'pagination[limit]': limit,
+        'sort': 'createdAt:desc',
+        'locale': strapiLocale,
+      });
 
-  return await fetchAPI(`/articles?${queryParams}`);
-}
-
-export async function getTrendingNews(limit = 10, locale = 'bn') {
-  const strapiLocale = getStrapiLocale(locale);
-  try {
-    const queryParams = new URLSearchParams({
-      'populate[0]': 'cover',
-      'populate[1]': 'category',
-      'pagination[limit]': limit,
-      'sort[0]': 'viewCount:desc',
-      'sort[1]': 'publishedAt:desc',
-      'locale': strapiLocale,
-    });
-
-    const response = await fetchAPI(`/articles?${queryParams}`);
-    
-    if (!response?.data || response.data.length === 0) {
-       return getLatestArticles(1, limit, locale);
+      return await fetchAPI(`/articles?${queryParams}`);
+    } catch (error) {
+      return { data: [] };
     }
-
-    return response;
-  } catch (error) {
-    return getLatestArticles(1, limit, locale);
-  }
+  };
 }
 
-export async function getReviewArticles(limit = 4, locale = 'bn') {
-  const strapiLocale = getStrapiLocale(locale);
-  try {
-    const queryParams = new URLSearchParams({
-      'populate[0]': 'cover',
-      'populate[1]': 'category',
-      'populate[2]': 'author',
-      'pagination[limit]': limit,
-      'sort': 'publishedAt:desc',
-      'locale': strapiLocale,
-    });
+// Section-specific article fetchers
+export const getTopNewsArticles = createSectionFetcher('isTopNews', 5);
+export const getHeadlineArticles = createSectionFetcher('isHeadline', 15);
+export const getTopSliderArticles = createSectionFetcher('isTopSlider', 10);
+export const getMiddleSliderArticles = createSectionFetcher('isMiddleSlider', 10);
+export const getMostReadArticles = createSectionFetcher('isMostRead', 10);
+export const getPopularNewsArticles = createSectionFetcher('isPopularNews', 10);
+export const getTechInnovationArticles = createSectionFetcher('isTechInnovation', 4);
+export const getEditorChoiceArticles = createSectionFetcher('isEditorsChoice', 5);
+export const getRecentPostArticles = createSectionFetcher('isRecentPost', 20);
+export const getRecentReviewArticles = createSectionFetcher('isRecentReview', 7);
+export const getAboutPageArticles = createSectionFetcher('isAboutPage', 4);
 
-    return await fetchAPI(`/articles?${queryParams}`);
-  } catch (error) {
-    return getLatestArticles(1, limit, locale);
-  }
-}
-
-export async function getPopularArticles(limit = 5, locale = 'bn') {
-  const strapiLocale = getStrapiLocale(locale);
-  try {
-    const queryParams = new URLSearchParams({
-      'populate[0]': 'cover',
-      'populate[1]': 'author',
-      'populate[2]': 'category',
-      'pagination[limit]': limit,
-      'sort[0]': 'viewCount:desc',
-      'sort[1]': 'createdAt:desc',
-      'locale': strapiLocale,
-    });
-
-    const response = await fetchAPI(`/articles?${queryParams}`);
-    if (!response?.data || response.data.length === 0) {
-      return getLatestArticles(1, limit, locale);
-    }
-    return response;
-  } catch (error) {
-    return getLatestArticles(1, limit, locale);
-  }
-}
-
-export async function getMostViewedArticles(limit = 5, locale = 'bn') {
-  const strapiLocale = getStrapiLocale(locale);
-  try {
-    const queryParams = new URLSearchParams({
-      'populate[0]': 'cover',
-      'populate[1]': 'category',
-      'pagination[limit]': limit,
-      'sort[0]': 'viewCount:desc',
-      'sort[1]': 'createdAt:desc',
-      'locale': strapiLocale,
-    });
-
-    const response = await fetchAPI(`/articles?${queryParams}`);
-    if (!response?.data || response.data.length === 0) {
-      return getLatestArticles(1, limit, locale);
-    }
-    return response;
-  } catch (error) {
-    return getLatestArticles(1, limit, locale);
-  }
-}
-
-export async function getVideoArticles(limit = 6, locale = 'bn') {
-  const strapiLocale = getStrapiLocale(locale);
-  try {
-    const queryParams = new URLSearchParams({
-      'filters[videoUrl][$notNull]': 'true',
-      'populate[0]': 'cover',
-      'populate[1]': 'category',
-      'pagination[limit]': limit,
-      'sort': 'createdAt:desc',
-      'locale': strapiLocale,
-    });
-
-    return await fetchAPI(`/articles?${queryParams}`);
-  } catch (error) {
-    return getLatestArticles(1, limit, locale);
-  }
-}
-
-
-export async function getEditorPicks(limit = 4, locale = 'bn') {
-  const strapiLocale = getStrapiLocale(locale);
-  try {
-    const queryParams = new URLSearchParams({
-      'populate[0]': 'cover',
-      'populate[1]': 'author',
-      'populate[2]': 'category',
-      'pagination[limit]': limit,
-      'sort': 'createdAt:desc',
-      'locale': strapiLocale,
-    });
-
-    return await fetchAPI(`/articles?${queryParams}`);
-  } catch (error) {
-    return getLatestArticles(1, limit, locale);
-  }
-}
+// Keep old names as aliases for backward compatibility
+export const getFeaturedArticles = getTopSliderArticles;
+export const getSliderArticles = getTopSliderArticles;
+export const getTrendingNews = getHeadlineArticles;
+export const getPopularArticles = getPopularNewsArticles;
+export const getMostViewedArticles = getMostReadArticles;
+export const getReviewArticles = getRecentReviewArticles;
+export const getEditorPicks = getEditorChoiceArticles;
 
 export async function getArticlesByCategorySlug(categorySlug, limit = 20, locale = 'bn') {
   const strapiLocale = getStrapiLocale(locale);

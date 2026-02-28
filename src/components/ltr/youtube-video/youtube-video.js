@@ -181,21 +181,21 @@ const YoutubeVideo = ({ data = [], isLoading = false }) => {
           </div>
         </div>
         <div className="RYPP-video">
-          {displayVideos.map((video, index) => (
+            {displayVideos[selectedVideo] && (
             <iframe
-              key={`RYPP-vp-da4e5dd6-${index}`}
+              key={`RYPP-vp-${selectedVideo}-${displayVideos[selectedVideo].id}`}
               className="RYPP-video-player"
-              style={{ display: index === selectedVideo ? 'block' : 'none' }}
-              id={`RYPP-vp-da4e5dd6-${index}`}
-              name={`RYPP-vp-da4e5dd6-${index}`}
+              style={{ display: 'block' }}
+              id={`RYPP-vp-da4e5dd6-${selectedVideo}`}
+              name={`RYPP-vp-da4e5dd6-${selectedVideo}`}
               frameBorder="0"
               allowFullScreen
               title="YouTube Video Player"
               width="640"
               height="360"
-              src={`https://www.youtube.com/embed/${video.id}`}
+              src={`https://www.youtube.com/embed/${displayVideos[selectedVideo].id}?autoplay=1`}
             ></iframe>
-          ))}
+            )}
         </div>
       </div>
     </div>

@@ -1,47 +1,49 @@
 
 import { fetchAPI } from '@/lib/strapi';
 
-export async function getCommentsByArticle(articleSlug) {
+/**
+ * Fetch comments for a specific article using strapi-plugin-comments
+ * The plugin exposes: GET /api/comments/api::article.article:<documentId>
+ */
+export async function getCommentsByArticle(articleDocumentId) {
   try {
-    const queryParams = new URLSearchParams({
-      'filters[article][slug][$eq]': articleSlug,
-      'filters[parent][$null]': 'true', // Only fetch top-level comments
-      'populate[children][fields][0]': 'content',
-      'populate[children][fields][1]': 'authorName',
-      'populate[children][fields][2]': 'authorEmail',
-      'populate[children][fields][3]': 'website',
-      'populate[children][fields][4]': 'subject',
-      'populate[children][fields][5]': 'createdAt',
-      'sort': 'createdAt:desc',
-      'pagination[limit]': 100,
-    });
-
-    return await fetchAPI(`/comments?${queryParams}`);
+    const response = await fetchAPI(
+      `/comments/api::article.article:${articleDocumentId}`,
+      { silent: true }
+    );
+    return response || { data: [] };
   } catch (error) {
-    console.warn('getCommentsByArticle failed:', error);
+    console.warn('getCommentsByArticle (plugin) failed:', error);
     return { data: [] };
   }
 }
 
-export async function createComment(articleDocumentId, authorName, authorEmail, content, website, subject, parentId = null) {
+/**
+ * Post a new comment using strapi-plugin-comments
+ * POST /api/comments/api::article.article:<documentId>
+ */
+export async function createComment(articleDocumentId, authorName, authorEmail, content, threadOf = null) {
   try {
-    const data = {
+    const body = {
+      author: {
+        id: authorEmail,
+        name: authorName,
+        email: authorEmail,
+      },
       content,
-      authorName,
-      authorEmail: authorEmail || null,
-      website: website || null,
-      subject: subject || null,
-      article: articleDocumentId,
     };
-    if (parentId) {
-      data.parent = parentId;
+    if (threadOf) {
+      body.threadOf = threadOf;
     }
-    return await fetchAPI('/comments', {
-      method: 'POST',
-      body: JSON.stringify({ data }),
-    });
+    return await fetchAPI(
+      `/comments/api::article.article:${articleDocumentId}`,
+      {
+        method: 'POST',
+        body: JSON.stringify(body),
+      }
+    );
   } catch (error) {
-    console.error('createComment failed:', error);
+    console.error('createComment (plugin) failed:', error);
     throw error;
   }
 }
