@@ -62,7 +62,7 @@ const AboutPage = () => {
                 {/* START PAGE HEADER */}
                 <section
                     className="inner-head bg-img"
-                    data-image-src={heroImageUrl}
+                    style={{ backgroundImage: `url(${heroImageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
                 >
                     <div className="container position-relative">
                         <div className="row">

@@ -3696,6 +3696,7 @@ abbr[title] {
 .playlist-title {
     background-color: #1b1c26;
     padding: 15px;
+    margin-bottom: 20px;
 }
 
 .playlist-title h4 {
@@ -7432,7 +7433,7 @@ blockquote.no-sign p {
     width: 100%;
     position: absolute;
     left: 0;
-    top: 64px;
+    top: 100px;
     right: 0;
     bottom: 0;
     overflow-y: auto; }
@@ -8456,3 +8457,40 @@ h3, .h3, .section-title { font-size: 21px !important; }
     }
 }
 
+
+/* --- Sidebar & Mobile Menu Font Size Overrides --- */
+
+/* Sidebar Description/Title */
+.header-locale-bn .sidebar-description {
+    font-size: 30px !important;
+    line-height: 1.4 !important;
+    font-weight: 500 !important;
+}
+
+.header-locale-en .sidebar-description {
+    font-size: 20px !important;
+}
+
+/* Sidebar Menu Items */
+.header-locale-bn #sidebar .nav-link {
+    font-size: 20px !important;
+    line-height: 1.2 !important;
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+}
+
+.header-locale-en #sidebar .nav-link {
+    font-size: 18px !important;
+}
+
+/* Mobile Collapse Menu Items */
+@media (max-width: 991px) {
+    .header-locale-bn #navbarSupportedContent .nav-link {
+        font-size: 28px !important;
+        line-height: 1.3 !important;
+    }
+    
+    .header-locale-en #navbarSupportedContent .nav-link {
+        font-size: 18px !important;
+    }
+}

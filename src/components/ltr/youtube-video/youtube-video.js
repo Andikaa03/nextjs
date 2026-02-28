@@ -68,6 +68,7 @@ const dummyVideos = [
 const YoutubeVideo = ({ data = [], isLoading = false }) => {
   const [videos, setVideos] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(0);
+  const [autoplay, setAutoplay] = useState(0);
   const { locale } = useLanguage();
   const t = dictionary[locale] || dictionary.bn;
 
@@ -132,6 +133,7 @@ const YoutubeVideo = ({ data = [], isLoading = false }) => {
 
   const handleThumbnailClick = (index) => {
     setSelectedVideo(index);
+    setAutoplay(1);
   };
   
   if (!isLoading && data.length === 0) return null; // Hide if no real data
@@ -183,7 +185,7 @@ const YoutubeVideo = ({ data = [], isLoading = false }) => {
         <div className="RYPP-video">
             {displayVideos[selectedVideo] && (
             <iframe
-              key={`RYPP-vp-${selectedVideo}-${displayVideos[selectedVideo].id}`}
+              key={`RYPP-vp-${selectedVideo}-${displayVideos[selectedVideo].id}-${autoplay}`}
               className="RYPP-video-player"
               style={{ display: 'block' }}
               id={`RYPP-vp-da4e5dd6-${selectedVideo}`}
@@ -193,7 +195,7 @@ const YoutubeVideo = ({ data = [], isLoading = false }) => {
               title="YouTube Video Player"
               width="640"
               height="360"
-              src={`https://www.youtube.com/embed/${displayVideos[selectedVideo].id}?autoplay=1`}
+              src={`https://www.youtube.com/embed/${displayVideos[selectedVideo].id}?autoplay=${autoplay}`}
             ></iframe>
             )}
         </div>
