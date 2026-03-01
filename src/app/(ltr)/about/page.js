@@ -14,7 +14,7 @@ import StrapiBlocks from '@/components/article/strapi-blocks';
 
 const AboutPage = () => {
     const { locale } = useLanguage();
-    useRemoveBodyClass(['home-two'], ['home-nine', 'boxed-layout', 'home-six', 'home-seven', 'None']);
+    useRemoveBodyClass(['None'], ['home-seven', 'home-nine', 'boxed-layout', 'home-six', 'home-two']);
     useBackgroundImageLoader();
 
     const [aboutData, setAboutData] = useState(null);
@@ -101,6 +101,13 @@ const AboutPage = () => {
                             </div>
                         )}
 
+                        {/* VISION SECTION - only if filled */}
+                        {aboutData?.vision && (
+                            <div className="about-title">
+                                <StrapiBlocks content={aboutData.vision} />
+                            </div>
+                        )}
+
                         {/* TEAM MEMBERS SECTION - only if filled */}
                         {teamMembers.length > 0 && (
                             <div className="row">
@@ -156,13 +163,7 @@ const AboutPage = () => {
                                 )}
                             </div>
                         )}
-
-                        {/* VISION SECTION - only if filled */}
-                        {aboutData?.vision && (
-                            <div className="about-title">
-                                <StrapiBlocks content={aboutData.vision} />
-                            </div>
-                        )}
+                
 
                         {/* RELATED ARTICLES - only if there are articles */}
                         {relatedArticles.length > 0 && (

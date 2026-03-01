@@ -8494,3 +8494,136 @@ h3, .h3, .section-title { font-size: 21px !important; }
         font-size: 18px !important;
     }
 }
+
+/* --- About Us Page Specific Visual Sync Overrides --- */
+
+/* Force White Hero Title (Overriding Global Dark !important) */
+.inner-head h1.entry-title,
+.inner-head .entry-title {
+    color: #fff !important;
+    text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Typography Sync (Using imported Fonts) */
+.about-content h1,
+.about-content h2,
+.about-content h3,
+.about-content h4,
+.about-content h5,
+.about-content h6 {
+    font-family: var(--font-roboto), sans-serif !important;
+}
+
+.about-content p,
+.about-content .description,
+.inner-head .description {
+    font-family: var(--font-source-sans), sans-serif !important;
+}
+
+/* Heading Sizes & Colors Sync with Template */
+.about-content h1 {
+    font-size: 36px !important;
+    font-weight: 700 !important;
+    margin-top: 0 !important;
+    color: #000 !important;
+}
+
+.about-content h2 {
+    font-size: 30px !important;
+    font-weight: 700 !important;
+    margin-top: 0 !important;
+    margin-bottom: 20px !important;
+    color: #000 !important;
+}
+
+.about-content h3 {
+    font-size: 26px !important;
+    color: rgb(121, 121, 121) !important;
+    margin-top: 0 !important;
+    font-weight: 300 !important;
+}
+
+.about-content p {
+    font-size: 15px !important;
+    margin-bottom: 20px !important;
+    line-height: 24px !important;
+    color: #777 !important;
+}
+
+/* Breadcrumb Styling Fix */
+.inner-head .breadcrumb li a {
+    color: #fecc17 !important;
+}
+
+.inner-head .breadcrumb li::after {
+    color: #cecfd2 !important;
+}
+
+/* Section Spacing Fix (Removing added wrappers if they conflict) */
+.about-title {
+    margin-bottom: 40px !important;
+}
+
+.mt-5.about-title {
+    margin-top: 50px !important;
+}
+
+/* Mission/Vision Block Background Transparency */
+.about-content .post_details_block {
+    background-color: transparent !important;
+}
+
+/* About Page Header Styling Synchronization */
+.inner-head .entry-title {
+    color: #fff !important;
+    text-shadow: 0px 1px 3px rgba(0, 0, 0, .5) !important;
+    font-size: 42px !important; /* Increased font size for Bengali title */
+    margin-bottom: 15px;
+}
+
+.inner-head .description {
+    color: #fff !important;
+    font-size: 18px; /* Slightly larger description to match increased title */
+}
+
+.inner-head .breadcrumb li {
+    display: inline-block;
+    color: #fff;
+}
+
+.inner-head .breadcrumb li a {
+    color: #fff;
+}
+
+.inner-head .breadcrumb li.current-page {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* About Page Typography - Light and Dark Mode Support */
+.about-content h1,
+.about-content h2,
+.about-content h3 {
+    color: #222; /* Light mode default */
+}
+
+.about-content p,
+.about-content li {
+    color: #555; /* Light mode default */
+}
+
+[data-theme="skin-dark"] .about-content h1,
+[data-theme="skin-dark"] .about-content h2,
+[data-theme="skin-dark"] .about-content h3 {
+    color: #ffffff !important; /* Force white in dark mode */
+}
+
+[data-theme="skin-dark"] .about-content p,
+[data-theme="skin-dark"] .about-content li {
+    color: #cecfd2 !important; /* Force light gray in dark mode */
+}
+
+/* Youtube Video Playlist Bangla Text Enhancement */
+.RYPP-items ol li p.title.title-bn {
+    font-size: 20px !important;
+    line-height: 1.5 !important;
+}

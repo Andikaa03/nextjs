@@ -156,6 +156,7 @@ export default function Home() {
   const [adsData, setAdsData] = useState(null);
   const [categories, setCategories] = useState([]);
   const [trendingCategories, setTrendingCategories] = useState([]);
+  const [showAllCategories, setShowAllCategories] = useState(false);
   const [weatherData, setWeatherData] = useState({
     currentTemp: null,
     apparentTemp: null,
@@ -304,8 +305,8 @@ export default function Home() {
           getEditorChoiceArticles(5, locale),
           getRecentPostArticles(20, locale),
           getRecentReviewArticles(7, locale),
-          getCategories(10, locale),
-          getTrendingCategories(10, locale),
+          getCategories(20, locale),
+          getTrendingCategories(20, locale),
           getAdsManagement(),
           getWeatherForecast(weatherLat, weatherLon, locale),
         ]);
@@ -675,27 +676,41 @@ export default function Home() {
                     <h4><strong>{t.trendingTopics}</strong></h4>
                   </div>
                   <div className="panel_body">
-                    {(trendingCategories.length > 0 ? trendingCategories.slice(0, 5) : (categories.length > 0 ? categories.slice(0, 5) : (loading ? Array(5).fill(null) : []))).map((cat, i) => {
-                      const catData = cat?.attributes || cat;
-                      const slug = catData?.slug || '#';
-                      const name = catData?.name || '...';
-                      const catImage = getStrapiMedia(catData?.featuredImage) || '/default.jpg';
+                    {(() => {
+                      const sourceCategories = trendingCategories.length > 0 ? trendingCategories : (categories.length > 0 ? categories : (loading ? Array(5).fill(null) : []));
+                      const displayCategories = showAllCategories ? sourceCategories : sourceCategories.slice(0, 5);
+                      
                       return (
-                        <div key={cat?.id || `tt-${i}`} className="text-center mb-2 card-bg-scale position-relative overflow-hidden bg-dark-overlay bg-img p-3" data-image-src={catImage}>
-                          <Link href={slug !== '#' ? `/category/${slug}` : '#'} className="btn-link fs-5 fw-bold stretched-link text-decoration-none text-white">
-                            {name}
-                          </Link>
-                        </div>
+                        <>
+                          {displayCategories.map((cat, i) => {
+                            const catData = cat?.attributes || cat;
+                            const slug = catData?.slug || '#';
+                            const name = catData?.name || '...';
+                            const catImage = getStrapiMedia(catData?.featuredImage) || '/default.jpg';
+                            return (
+                              <div key={cat?.id || `tt-${i}`} className="text-center mb-2 card-bg-scale position-relative overflow-hidden bg-dark-overlay bg-img p-3" data-image-src={catImage}>
+                                <Link href={slug !== '#' ? `/category/${slug}` : '#'} className="btn-link fs-5 fw-bold stretched-link text-decoration-none text-white">
+                                  {name}
+                                </Link>
+                              </div>
+                            );
+                          })}
+                          
+                          {!showAllCategories && sourceCategories.length > 5 && (
+                            <div className="text-center mt-3">
+                              <span
+                                role="button"
+                                onClick={() => setShowAllCategories(true)}
+                                className={`text-primary-hover see-all-categories-link ${locale === 'bn' ? 'see-all-categories-link-bn' : ''}`}
+                                style={{ cursor: 'pointer' }}
+                              >
+                                <u>{t.seeAllCategories}</u>
+                              </span>
+                            </div>
+                          )}
+                        </>
                       );
-                    })}
-                    <div className="text-center mt-3">
-                      <Link
-                        href="#footer"
-                        className={`text-primary-hover see-all-categories-link ${locale === 'bn' ? 'see-all-categories-link-bn' : ''}`}
-                      >
-                        <u>{t.seeAllCategories}</u>
-                      </Link>
-                    </div>
+                    })()}
                   </div>
                 </div>
                 {/* END OF /. TRENDING TOPICS */}

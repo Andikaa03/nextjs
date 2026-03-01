@@ -14,7 +14,7 @@ export async function getGlobalSettings(locale = 'bn') {
 export async function getFooterData(locale = 'bn') {
   const strapiLocale = getStrapiLocale(locale);
   try {
-    return await fetchAPI(`/footer?populate=*&locale=${strapiLocale}`, { silent: true });
+    return await fetchAPI(`/footer?populate=*&populate[socialLinks]=*&locale=${strapiLocale}`, { silent: true });
   } catch {
     return { data: null };
   }

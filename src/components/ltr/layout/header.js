@@ -150,77 +150,44 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                 return;
             }
             
-            if (hideMiddleHeader) {
-                // INNER PAGES (Layout 2)
-                const container = navEl.closest('.container-fluid');
-                if (!container) return;
-                
-                let siblingsWidth = 150; // Force 150px buffer for search/theme icons if measure fails
-                const collapse = navEl.closest('.navbar-collapse');
-                if (collapse && collapse.parentElement) {
-                    Array.from(collapse.parentElement.children).forEach(child => {
-                        if (child !== collapse && window.getComputedStyle(child).display !== 'none') {
-                            siblingsWidth += child.offsetWidth;
-                        }
-                    });
-                }
-                
-                const containerStyle = window.getComputedStyle(container);
-                const paddingLeft = parseFloat(containerStyle.paddingLeft || 0);
-                const paddingRight = parseFloat(containerStyle.paddingRight || 0);
-                
-                let maxWidth = container.clientWidth - paddingLeft - paddingRight - siblingsWidth - 20;
-                if (maxWidth < 300) maxWidth = 300;
-                
-                const baseFontSize = locale === 'bn' ? 20 : 16;
-                const minFontSize = locale === 'bn' ? 21 : 11.5;
-                
-                navEl.style.fontSize = baseFontSize + 'px';
-                let fontSize = baseFontSize;
-                while (navEl.scrollWidth > maxWidth && fontSize > minFontSize) {
-                    fontSize -= 0.5;
-                    navEl.style.fontSize = fontSize + 'px';
-                }
-            } else {
-                // HOME PAGE (Layout 1) - Original User Logic 
-                const container = navEl.closest('.container');
-                if (!container) return;
-                
-                let siblingsWidth = 0;
-                
-                // Pada layout HideMiddleHeader, container-fluid memegang navbar-collapse dan dibungkus max-width 1340px
-                // Kita harus menghitung lebar dari div d-lg-flex yang memegang icon search & matahari
-                const rightIconsContainer = container.querySelector('.d-none.d-lg-flex');
-                if (rightIconsContainer) {
-                    siblingsWidth += rightIconsContainer.offsetWidth;
-                }
-                
-                const collapse = navEl.closest('.navbar-collapse');
-                if (collapse && collapse.parentElement) {
-                    // Juga kurangi toggle mobile / brand dummy di flexbox navbar jika ada didalam parent yg sama
-                    Array.from(collapse.parentElement.children).forEach(child => {
-                        if (child !== collapse && child !== rightIconsContainer && window.getComputedStyle(child).display !== 'none') {
-                            siblingsWidth += child.offsetWidth;
-                        }
-                    });
-                }
-                
-                const maxWidth = container.clientWidth - siblingsWidth - 20;
-                
-                const baseFontSize = locale === 'bn' ? 20 : 16;
-                const minFontSize = locale === 'bn' ? 14 : 11;
-                
-                navEl.style.fontSize = baseFontSize + 'px';
-                let fontSize = baseFontSize;
-                while (navEl.scrollWidth > maxWidth && fontSize > minFontSize) {
-                    fontSize -= 0.5;
-                    navEl.style.fontSize = fontSize + 'px';
-                }
+            // UNIFIED LOGIC FOR ALL PAGES
+            const container = navEl.closest('.container');
+            if (!container) return;
+            
+            let siblingsWidth = 0;
+            
+            // Calculate width of right icons (search & theme)
+            const rightIconsContainer = container.querySelector('.d-none.d-lg-flex');
+            if (rightIconsContainer) {
+                siblingsWidth += rightIconsContainer.offsetWidth;
+            }
+            
+            const collapse = navEl.closest('.navbar-collapse');
+            if (collapse && collapse.parentElement) {
+                // Also subtract width of other siblings in the navbar container
+                Array.from(collapse.parentElement.children).forEach(child => {
+                    if (child !== collapse && child !== rightIconsContainer && window.getComputedStyle(child).display !== 'none') {
+                        siblingsWidth += child.offsetWidth;
+                    }
+                });
+            }
+            
+            const maxWidth = container.clientWidth - siblingsWidth - 20;
+            
+            const baseFontSize = locale === 'bn' ? 20 : 16;
+            // Use consistent minFontSize parameters
+            const minFontSize = locale === 'bn' ? 14 : 11;
+            
+            navEl.style.fontSize = baseFontSize + 'px';
+            let fontSize = baseFontSize;
+            while (navEl.scrollWidth > maxWidth && fontSize > minFontSize) {
+                fontSize -= 0.5;
+                navEl.style.fontSize = fontSize + 'px';
             }
         };
 
         // Use ResizeObserver to detect zoom/resize changes reliably
-        const containerRef = hideMiddleHeader ? navEl.closest('.container-fluid') : navEl.closest('.container');
+        const containerRef = navEl.closest('.container');
         let ro;
         if (containerRef && typeof ResizeObserver !== 'undefined') {
             ro = new ResizeObserver(() => fitNav());
@@ -479,10 +446,10 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
 
     return (
         <>
-            <header className={`main-header header-locale-${locale}`}>
+            <header className={`main-header header-locale-${locale} home-nine`}>
                 {/* START HEADER TOP */}
-                <div className="header-top">
-                    <div className={`${hideMiddleHeader ? 'container-fluid px-4 px-lg-5' : 'container'}`}>
+                <div className="header-top border-bottom">
+                    <div className="container">
                         <div className="row">
                             <div className="col">
                                 {/* Start top left menu */}
@@ -565,15 +532,15 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                 {/* START MIDDLE SECTION */}
                 {hideMiddleHeader || path.includes('/article/') ? (
                     <div className="d-md-block d-none header-mid pt-2 pb-2">
-                        <div className="container">
+                        <div className="container" style={{ maxWidth: '1040px', margin: '0 auto' }}>
                             <div className="align-items-center row">
                                 <div className="col-sm-4">
-                                    <Link href="/">
+                                    <Link href="/" className="header-logo">
                                         <img
-                                            src={headerLogo || "/assets/images/logo.png"}
+                                            src={headerLogo || "assets/images/logo.png"}
                                             className="img-fluid header-logo"
                                             alt="Logo"
-                                            style={{ width: '250px', height: '60px', objectFit: 'contain' }}
+                                            style={{ width: '180px', height: '45px', objectFit: 'contain' }}
                                         />
                                     </Link>
                                 </div>
@@ -591,9 +558,9 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                         </div>
                     </div>
                 ) : (
-                    <div className="d-md-block d-none header-mid pt-2 pb-2">
-                        <div className="container">
-                            <div className="align-items-center row justify-content-center">
+                    <div className="d-md-block d-none header-mid" style={{height : "96px"}}>
+                        <div className="container h-100">
+                            <div className="align-items-center row justify-content-center h-100">
                                 <div className="col">
                                     <div className="hstack gap-3">
                                         <div id="nav-icon" className={isSidebarActive ? 'open' : ''}>
@@ -608,11 +575,11 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                         <div className="fs-5 fw-semibold weather-text d-flex align-items-center gap-2">
                                             {getWeatherIcon(weather.icon)} {weatherTempText}{weatherUnitText}
                                         </div>
-                                        <Link href="/" className="header-logo">
+                                        <Link href="/" className="header-logo" >
                                             <img 
                                                 src={headerLogo || "assets/images/logo.png"} 
                                                 alt="Logo" 
-                                                style={{ width: '180px', height: '45px', objectFit: 'contain' }}
+                                                style={{ width: '210px', height: '56px', objectFit: 'contain' }}
                                             />
                                         </Link>
                                         <div className="dropdown language-dropdown">
@@ -635,8 +602,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
 
                 {/* START NAVIGATION */}
                 <nav 
-                    className="custom-navbar navbar navbar-expand-lg sticky-top flex-column no-logo"
-                    style={hideMiddleHeader ? { maxWidth: '1400px', margin: '0 auto' } : {}}
+                    className="custom-navbar navbar navbar-expand-lg sticky-top flex-column no-logo border-top border-bottom"
                 >
                     <div className={`fullscreen-search-overlay ${isSearchOpen ? 'fullscreen-search-overlay-show' : ''}`} >
                         <Link href="#" className="fullscreen-close" onClick={handleCloseButtonClick} id="fullscreen-close-button"><i className="ti ti-close" /></Link>
@@ -655,7 +621,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                             </form>
                         </div>
                     </div>
-                    <div className={`${hideMiddleHeader ? 'container-fluid px-4 px-lg-5' : 'container'} position-relative`}>
+                    <div className="container position-relative">
                         <Link className="navbar-brand d-md-none" href="/">
                             <img 
                                 src={headerLogo || "assets/images/logo.png"} 

@@ -235,14 +235,26 @@ const Footer = () => {
             </div>
             {/*  END OF /. FOOTER BOX (Qr Code) */}
             
-            {/* START FOOTER BOX (Social Contact - Was Twitter) */}
+            {/* START FOOTER BOX (Social Contact - Dynamic) */}
             <div className="col-sm-6 col-lg-3 footer-box py-4">
                <h5 className="wiget-title">{t.social}</h5>
                 <ul className="list-unstyled m-0 menu-services">
-                    <li><a href={globalSettings?.socialFacebookUrl || "#"} target="_blank">{t.socialLinks.fb}</a></li>
-                    <li><a href={globalSettings?.socialTwitterUrl || "#"} target="_blank">{t.socialLinks.tw}</a></li>
-                    <li><a href={globalSettings?.socialYoutubeUrl || "#"} target="_blank">{t.socialLinks.yt}</a></li>
-                    <li><a href={globalSettings?.socialInstagramUrl || "#"} target="_blank">{t.socialLinks.ig}</a></li>
+                    {footerAttrs?.socialLinks && footerAttrs.socialLinks.length > 0 ? (
+                        footerAttrs.socialLinks.map((link, i) => (
+                            <li key={i}>
+                                <a href={link.url || "#"} target="_blank" rel="noopener noreferrer">
+                                    {link.title}
+                                </a>
+                            </li>
+                        ))
+                    ) : (
+                        <>
+                            <li><a href={globalSettings?.socialFacebookUrl || "#"} target="_blank" rel="noopener noreferrer">{t.socialLinks.fb}</a></li>
+                            <li><a href={globalSettings?.socialTwitterUrl || "#"} target="_blank" rel="noopener noreferrer">{t.socialLinks.tw}</a></li>
+                            <li><a href={globalSettings?.socialYoutubeUrl || "#"} target="_blank" rel="noopener noreferrer">{t.socialLinks.yt}</a></li>
+                            <li><a href={globalSettings?.socialInstagramUrl || "#"} target="_blank" rel="noopener noreferrer">{t.socialLinks.ig}</a></li>
+                        </>
+                    )}
                 </ul>
             </div>
             {/* END OF /. FOOTER BOX (Social Contact) */}

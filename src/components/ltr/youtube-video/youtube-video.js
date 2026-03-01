@@ -163,7 +163,7 @@ const YoutubeVideo = ({ data = [], isLoading = false }) => {
                     className={selectedVideo === index ? 'selected' : ''}
                     onClick={() => handleThumbnailClick(index)}
                   >
-                    <p className="title">
+                    <p className={`title ${locale === 'bn' ? 'title-bn' : ''}`}>
                       {video.title}
                       <small className="author">
                         <br />
