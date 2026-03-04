@@ -41,7 +41,12 @@ const NewsTicker = ({ data = [], isLoading = false }) => {
   const t = dictionary[locale] || dictionary.bn;
   
   // Use dummy data if loading, otherwise real data
-  const items = isLoading ? t.dummy : data;
+  let items = isLoading ? t.dummy : data;
+
+  // Clone if only 1 item to force Owl Carousel to loop and show navigation
+  if (!isLoading && items.length === 1) {
+    items = [items[0], items[0]];
+  }
 
   if (!isLoading && items.length === 0) return null;
 
