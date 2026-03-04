@@ -531,7 +531,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
 
                 {/* START MIDDLE SECTION */}
                 {hideMiddleHeader || path.includes('/article/') ? (
-                    <div className="d-md-block d-none header-mid pt-2 pb-2">
+                    <div className="d-md-block d-none header-mid pt-2 pb-2" style={{ height: '96px' }}>
                         <div className="container" style={{ maxWidth: '1040px', margin: '0 auto' }}>
                             <div className="align-items-center row">
                                 <div className="col-sm-4">
