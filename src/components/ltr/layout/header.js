@@ -448,7 +448,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
         <>
             <header className={`main-header header-locale-${locale} home-nine`}>
                 {/* START HEADER TOP */}
-                <div className="header-top border-bottom">
+                <div className="header-top border-bottom" style={{ minHeight: '40.26px', maxHeight: '40.26px', display: 'flex', alignItems: 'center' }}>
                     <div className="container">
                         <div className="row">
                             <div className="col">
@@ -615,7 +615,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                 `}</style>
                 <nav 
                     className="custom-navbar navbar navbar-expand-lg sticky-top flex-column no-logo border-top border-bottom"
-                    style={{ minHeight: '53px', maxHeight: '53px', padding: 0 }}
+                    style={{ minHeight: '53.61px', maxHeight: '53.61px', padding: 0 }}
                 >
                     <div className={`fullscreen-search-overlay ${isSearchOpen ? 'fullscreen-search-overlay-show' : ''}`} >
                         <Link href="#" className="fullscreen-close" onClick={handleCloseButtonClick} id="fullscreen-close-button"><i className="ti ti-close" /></Link>
