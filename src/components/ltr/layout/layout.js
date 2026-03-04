@@ -10,7 +10,7 @@ export default function Layout({ children, hideMiddleHeader = false, globalSetti
    <>
       <Header hideMiddleHeader={hideMiddleHeader} globalSettings={globalSettings}/>
        {children}
-      <Footer/>
+      <Footer hideMiddleHeader={hideMiddleHeader}/>
    </>
 
   );

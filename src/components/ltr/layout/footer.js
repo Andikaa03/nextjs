@@ -74,7 +74,7 @@ const dictionary = {
   }
 };
 
-const Footer = () => {
+const Footer = ({ hideMiddleHeader = false }) => {
   useBackgroundImageLoader();
   const { locale } = useLanguage();
   const isBanglaLocale = (locale || '').toLowerCase().startsWith('bn');
@@ -217,22 +217,24 @@ const Footer = () => {
           <hr className="mt-5 mb-4" />
           <div className="row">
             {/* START FOOTER BOX (Qr Code) */}
-            <div className="col-sm-6 col-lg-3 footer-box py-4">
-              <div className="about-inner text-center">
-                <h5 className="wiget-title">{t.app.title}</h5>
-                <div className="bg-white pb-0 mb-3 d-inline-block rounded">
-                  {/* Start Qr Code Image */}
-                  <img
-                    src={getStrapiMedia(footerAttrs?.appQrImage) || "/assets/images/qr-code.png"}
-                    height={180}
-                    width={180}
-                    alt="Qr Code"
-                  />
-                  {/* /. End Qr Code Image */}
+            {!hideMiddleHeader && (
+              <div className="col-sm-6 col-lg-3 footer-box py-4">
+                <div className="about-inner text-center">
+                  <h5 className="wiget-title">{t.app.title}</h5>
+                  <div className="bg-white pb-0 mb-3 d-inline-block rounded">
+                    {/* Start Qr Code Image */}
+                    <img
+                      src={getStrapiMedia(footerAttrs?.appQrImage) || "/assets/images/qr-code.png"}
+                      height={180}
+                      width={180}
+                      alt="Qr Code"
+                    />
+                    {/* /. End Qr Code Image */}
+                  </div>
+                  <p>{footerAttrs?.appDescription || t.app.text}</p>
                 </div>
-                <p>{footerAttrs?.appDescription || t.app.text}</p>
               </div>
-            </div>
+            )}
             {/*  END OF /. FOOTER BOX (Qr Code) */}
             
             {/* START FOOTER BOX (Social Contact - Dynamic) */}
