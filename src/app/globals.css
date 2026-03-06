@@ -560,6 +560,15 @@ ul.cart-list>li.total>.btn:focus {
     fill: #ffffff !important;
     margin-bottom:5px;
 }
+
+/* Force scroll-to-top to always show on mobile */
+@media (max-width: 767px) {
+    .scroll-to-top {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+}
+
 @media (min-width: 768px) {
     #toTop {
         right: 30px;
