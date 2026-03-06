@@ -11,7 +11,7 @@ import "owl.carousel/dist/assets/owl.carousel.css";
 import "owl.carousel/dist/assets/owl.theme.default.css";
 import 'animate.css/animate.css';
 import { getCategoryBySlug } from '@/services/categoryService';
-import { getArticlesByCategoryEnhanced, getMostViewedArticles, getPopularArticles } from '@/services/articleService';
+import { getArticlesByCategoryEnhanced, getMostViewedByCategory, getPopularByCategory, getTopSliderByCategory, getHeadlineByCategory } from '@/services/articleService';
 import { getGlobalSettings } from '@/services/globalService';
 import { getStrapiMedia, formatDate } from '@/lib/strapi';
 import ImageWithFallback from '@/components/ui/ImageWithFallback';
@@ -53,19 +53,16 @@ const OwlCarousel = dynamic(() => import('react-owl-carousel'), { ssr: false });
 // ---- Skeleton placeholders ----
 const SKELETON_ARTICLES = Array.from({ length: 9 }, (_, i) => ({ id: `sk-${i}`, _skeleton: true }));
 
-const ArticleSkeleton = () => (
+const ArticleSkeleton = ({ t }) => (
     <article>
         <figure>
-            <a href="#" className="news-image">
-                <img src="/default.jpg" alt="" className="img-fluid" />
-            </a>
             <a href="#" className="news-image">
                 <img src="/default.jpg" alt="" className="img-fluid" />
             </a>
             <span className="post-category">...</span>
         </figure>
         <div className="post-info">
-            <h3><a href="#">...</a></h3>
+            <h3><a href="#">{t.loadingTitle}</a></h3>
             <ul className="authar-info d-flex flex-wrap">
                 <li><i className="ti ti-timer" /> ...</li>
             </ul>
@@ -73,17 +70,17 @@ const ArticleSkeleton = () => (
     </article>
 );
 
-const SliderSkeleton = () => (
+const SliderSkeleton = ({ t }) => (
     <div className="slider-post post-height-1">
         <a href="#" className="news-image">
             <img src="/default.jpg" alt="" className="img-fluid" />
         </a>
         <div className="post-text">
-            <span className="post-category">লোড হচ্ছে...</span>
-            <h2><a href="#">লোড হচ্ছে: সংবাদের শিরোনাম এখানে দেখাবে...</a></h2>
+            <span className="post-category">{t.loading}</span>
+            <h2><a href="#">{t.loadingTitle}</a></h2>
             <ul className="authar-info d-flex flex-wrap">
-                <li className="authar"><a href="#">লোডিং...</a></li>
-                <li className="date">লোডিং...</li>
+                <li className="authar"><a href="#">{t.loading}</a></li>
+                <li className="date">{t.loading}</li>
             </ul>
         </div>
     </div>
@@ -225,18 +222,22 @@ const CategoryPage = () => {
     const [mostViewed, setMostViewed] = useState([]);
     const [popularNews, setPopularNews] = useState([]);
     const [globalSettings, setGlobalSettings] = useState(null);
+    const [sliderData, setSliderData] = useState([]);
+    const [gridData, setGridData] = useState([]);
 
     useEffect(() => {
         if (!slug) return;
         const fetchData = async () => {
             setLoading(true);
             try {
-                const [catData, articlesRes, mostViewedRes, popularRes, globalRes] = await Promise.all([
+                const [catData, articlesRes, mostViewedRes, popularRes, globalRes, sliderRes, gridRes] = await Promise.all([
                     getCategoryBySlug(slug, locale).catch(() => null),
                     getArticlesByCategoryEnhanced(slug, 19, { page }, locale).catch(() => ({ data: [] })),
-                    getMostViewedArticles(5, locale).catch(() => ({ data: [] })),
-                    getPopularArticles(5, locale).catch(() => ({ data: [] })),
+                    getMostViewedByCategory(slug, 5, locale).catch(() => ({ data: [] })),
+                    getPopularByCategory(slug, 5, locale).catch(() => ({ data: [] })),
                     getGlobalSettings(locale).catch(() => ({ data: null })),
+                    getTopSliderByCategory(slug, 5, locale).catch(() => ({ data: [] })),
+                    getHeadlineByCategory(slug, 4, locale).catch(() => ({ data: [] })),
                 ]);
                 const name = catData?.attributes?.name || catData?.name || slug;
                 setCategoryName(name);
@@ -247,6 +248,8 @@ const CategoryPage = () => {
                 setPopularNews(popularRes?.data || []);
                 const globalRaw = globalRes?.data || globalRes || null;
                 setGlobalSettings(globalRaw?.attributes || globalRaw);
+                setSliderData(sliderRes?.data || []);
+                setGridData(gridRes?.data || []);
             } catch (e) {
                 console.error('CategoryPage fetch error:', e);
             } finally {
@@ -256,10 +259,10 @@ const CategoryPage = () => {
         fetchData();
     }, [slug, page]);
 
-    // Split articles into sections
-    const sliderArticles = loading ? SKELETON_ARTICLES.slice(0, 5) : articles.slice(0, 5);
-    const gridArticles = loading ? SKELETON_ARTICLES.slice(0, 4) : articles.slice(5, 9);
-    const mainArticles = loading ? SKELETON_ARTICLES : articles.slice(9);
+    // Slider & grid use flagged articles; main content uses general category articles
+    const sliderArticles = loading ? SKELETON_ARTICLES.slice(0, 5) : sliderData;
+    const gridArticles = loading ? SKELETON_ARTICLES.slice(0, 4) : gridData;
+    const mainArticles = loading ? SKELETON_ARTICLES : articles;
 
     return (
         <Layout hideMiddleHeader={true} globalSettings={globalSettings}>
@@ -269,7 +272,7 @@ const CategoryPage = () => {
                     <div className="align-items-center row">
                         <div className="col">
                             <h1 className="mb-sm-0">
-                                <strong>{loading ? 'লোড হচ্ছে...' : categoryName}</strong>
+                                <strong>{loading ? t.loading : categoryName}</strong>
                             </h1>
                         </div>
                         <div className="col-12 col-sm-auto">
@@ -292,6 +295,7 @@ const CategoryPage = () => {
             {/* *** START PAGE MAIN CONTENT *** */}
             <main className="page_main_wrapper">
                 {/* START POST BLOCK SECTION */}
+                {(loading || sliderArticles.length > 0) && (
                 <section className="slider-inner">
                     <div className="container">
                         <div className="row thm-margin">
@@ -299,15 +303,13 @@ const CategoryPage = () => {
                             <div className="col-md-6 thm-padding">
                                 <div className="slider-wrapper" style={{ minHeight: '400px' }}>
                                     {loading ? (
-                                        <SliderSkeleton />
-                                    ) : sliderArticles.length > 0 ? (
+                                        <SliderSkeleton t={t} />
+                                    ) : (
                                         <OwlCarousel key={`slider-${articles.length}`} id="owl-slider" className="owl-theme" {...carouselOptions}>
                                             {sliderArticles.map((article) => (
                                                 <SliderItem key={article.id} article={article} categoryName={categoryName} />
                                             ))}
                                         </OwlCarousel>
-                                    ) : (
-                                        <SliderSkeleton />
                                     )}
                                 </div>
                             </div>
@@ -337,6 +339,7 @@ const CategoryPage = () => {
                         </div>
                     </div>
                 </section>
+                )}
                 {/* END OF /. POST BLOCK SECTION */}
 
                 <div className="container">
@@ -350,7 +353,7 @@ const CategoryPage = () => {
                                             {loading
                                                 ? SKELETON_ARTICLES.map((_, i) => (
                                                     <div className="col-md-6 col-p" key={i}>
-                                                        <ArticleSkeleton />
+                                                        <ArticleSkeleton t={t} />
                                                     </div>
                                                 ))
                                                 : mainArticles.length === 0 && articles.length === 0
@@ -495,7 +498,7 @@ const CategoryPage = () => {
                                                         ? Array.from({ length: 5 }, (_, i) => (
                                                             <li key={i}>
                                                                 <span className="count">{String(i + 1).padStart(2, '0')}</span>
-                                                                <span className="text"><a href="#">লোড হচ্ছে: সংবাদের শিরোনাম এখানে দেখাবে...</a></span>
+                                                                <span className="text"><a href="#">{t.loadingTitle}</a></span>
                                                             </li>
                                                         ))
                                                         : mostViewed.map((article, i) => {
@@ -526,14 +529,10 @@ const CategoryPage = () => {
                                                 {loading
                                                     ? Array.from({ length: 3 }, (_, i) => (
                                                         <div className="p-post" key={i}>
-                                                            <h4><a href="#">লোড হচ্ছে: সংবাদের শিরোনাম এখানে দেখাবে...</a></h4>
+                                                            <h4><a href="#">{t.loadingTitle}</a></h4>
                                                             <ul className="authar-info d-flex flex-wrap justify-content-center">
-                                                                <li className="date"><a href="#"><i className="ti ti-timer" /> লোডিং...</a></li>
+                                                                <li className="date"><a href="#"><i className="ti ti-timer" /> {t.loading}</a></li>
                                                             </ul>
-                                                            <div className="reatting-2">
-                                                                <i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star" />
-                                                                <i className="fas fa-star-half-alt" /><i className="far fa-star" />
-                                                            </div>
                                                         </div>
                                                     ))
                                                     : popularNews.map((article) => {

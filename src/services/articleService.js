@@ -154,6 +154,34 @@ export const getMostViewedArticles = getMostReadArticles;
 export const getReviewArticles = getRecentReviewArticles;
 export const getEditorPicks = getEditorChoiceArticles;
 
+// Category-filtered section fetchers for sidebar
+function createCategorySectionFetcher(flagName, defaultLimit = 10) {
+  return async function(categorySlug, limit = defaultLimit, locale = 'bn') {
+    const strapiLocale = getStrapiLocale(locale);
+    try {
+      const queryParams = new URLSearchParams({
+        [`filters[${flagName}][$eq]`]: 'true',
+        'filters[category][slug][$eq]': categorySlug,
+        'populate[0]': 'cover',
+        'populate[1]': 'author',
+        'populate[2]': 'category',
+        'pagination[limit]': limit,
+        'sort': 'createdAt:desc',
+        'locale': strapiLocale,
+      });
+      return await fetchAPI(`/articles?${queryParams}`);
+    } catch (error) {
+      return { data: [] };
+    }
+  };
+}
+
+export const getMostViewedByCategory = createCategorySectionFetcher('isMostRead', 5);
+export const getPopularByCategory = createCategorySectionFetcher('isPopularNews', 5);
+export const getTopSliderByCategory = createCategorySectionFetcher('isTopSlider', 10);
+export const getHeadlineByCategory = createCategorySectionFetcher('isHeadline', 10);
+export const getTopNewsByCategory = createCategorySectionFetcher('isTopNews', 5);
+
 export async function getArticlesByCategorySlug(categorySlug, limit = 20, locale = 'bn') {
   const strapiLocale = getStrapiLocale(locale);
   const queryParams = new URLSearchParams({
