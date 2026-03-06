@@ -73,7 +73,7 @@ export async function getMenuItems(location = 'header', locale = 'bn') {
       ].join('&');
     } else if (location === 'footer') {
       endpoint = '/footer';
-      query = `locale=${strapiLocale}&populate[menu]=*&populate[logo]=*&populate[appQrImage]=*&populate[backgroundImage]=*&populate[socialLinks]=*&populate[footerCategoryLinks]=*`;
+      query = `locale=${strapiLocale}&populate=*`;
     } else if (location === 'sidebar') {
       endpoint = '/sidebar';
       query = `locale=${strapiLocale}&populate=*`;
