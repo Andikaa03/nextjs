@@ -310,7 +310,7 @@ const CategoryPage = () => {
                                     ) : (
                                         <OwlCarousel key={`slider-${articles.length}`} id="owl-slider" className="owl-theme" {...carouselOptions}>
                                             {sliderArticles.map((article) => (
-                                                <SliderItem key={article.id} article={article} categoryName={categoryName} />
+                                                <SliderItem key={article.id} article={article} categoryName={categoryName} locale={locale} />
                                             ))}
                                         </OwlCarousel>
                                     )}
@@ -334,7 +334,7 @@ const CategoryPage = () => {
                                             </div>
                                         ))
                                         : gridArticles.map((article) => (
-                                            <GridItem key={article.id} article={article} categoryName={categoryName} />
+                                            <GridItem key={article.id} article={article} categoryName={categoryName} locale={locale} />
                                         ))
                                     }
                                 </div>
@@ -367,7 +367,7 @@ const CategoryPage = () => {
                                                     )
                                                     : mainArticles.map((article) => (
                                                         <div className="col-md-6 col-p" key={article.id}>
-                                                            <ArticleCard article={article} categoryName={categoryName} />
+                                                            <ArticleCard article={article} categoryName={categoryName} locale={locale} />
                                                         </div>
                                                     ))
                                             }
