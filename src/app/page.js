@@ -689,7 +689,7 @@ export default function Home() {
                             const catImage = getStrapiMedia(catData?.featuredImage) || '/default.jpg';
                             return (
                               <div key={cat?.id || `tt-${i}`} className="text-center mb-2 card-bg-scale position-relative overflow-hidden bg-dark-overlay bg-img p-3" data-image-src={catImage}>
-                                <Link href={slug !== '#' ? `/category/${slug}` : '#'} className="btn-link fs-5 fw-bold stretched-link text-decoration-none text-white">
+                                <Link href={slug !== '#' ? `/${slug}` : '#'} className="btn-link fs-5 fw-bold stretched-link text-decoration-none text-white">
                                   {name}
                                 </Link>
                               </div>

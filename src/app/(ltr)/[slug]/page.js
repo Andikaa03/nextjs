@@ -371,7 +371,7 @@ const CategoryPage = () => {
                                             <Pagination
                                                 currentPage={pagination.page}
                                                 totalPages={pagination.pageCount}
-                                                basePath={`/category/${slug}`}
+                                                basePath={`/${slug}`}
                                             />
                                         )}
                                     </div>
