@@ -24,11 +24,22 @@ export async function generateMetadata({ params }) {
   const metaTitle = seo.metaTitle || data.title;
   const metaDescription = seo.metaDescription || data.excerpt || '';
   const shareImage = getStrapiMedia(seo.shareImage) || getStrapiMedia(data.cover);
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://shottyodharaprotidin.com';
+  const articleUrl = `${siteUrl}/article/${slug}`;
 
   return {
     title: metaTitle,
     description: metaDescription,
     openGraph: {
+      title: metaTitle,
+      description: metaDescription,
+      url: articleUrl,
+      siteName: 'Satyadhara Protidin',
+      type: 'article',
+      images: shareImage ? [shareImage] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
       title: metaTitle,
       description: metaDescription,
       images: shareImage ? [shareImage] : [],

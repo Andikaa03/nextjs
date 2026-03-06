@@ -4577,6 +4577,10 @@ figure.social-icon>div a i.fa-pinterest-p {
     background-color: #cb2028;
 }
 
+figure.social-icon>div a i.fa-whatsapp {
+    background-color: #25d366;
+}
+
 figure.social-icon>div a i:hover {
     opacity: .8;
 }

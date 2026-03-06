@@ -10,6 +10,7 @@ import useRemoveBodyClass from "@/components/ltr/useEffect-hook/useEffect-hook";
 import { getStrapiMedia, formatDate } from '@/lib/strapi';
 import { useTranslations } from '@/lib/translations';
 import StrapiBlocks from '@/components/article/strapi-blocks';
+import SocialShare from '@/components/article/social-share';
 
 const ClientArticleDetail = ({ article, mostViewed, popularNews, globalSettings, adsData, locale = 'bn' }) => {
   useRemoveBodyClass(['None'], ['home-seven', 'home-nine','boxed-layout','home-six']);
@@ -77,14 +78,8 @@ const ClientArticleDetail = ({ article, mostViewed, popularNews, globalSettings,
                                 alt={title}
                                 onError={(e) => e.target.style.display = 'none'}
                             />
-                            {/* Social Share matched from template */}
-                            <div>
-                                <Link href={gs?.socialFacebookUrl || '#'} target="_blank"><i className="fab fa-facebook-f" /></Link>
-                                <Link href={gs?.socialTwitterUrl || '#'} target="_blank"><i className="fab fa-twitter" /></Link>
-                                <Link href={gs?.socialInstagramUrl || '#'} target="_blank"><i className="fab fa-instagram" /></Link>
-                                <Link href={gs?.socialPinterestUrl || '#'} target="_blank" className="d-md-block d-none pint"><i className="fab fa-pinterest-p" /></Link>
-                                <Link href={gs?.socialLinkedinUrl || '#'} target="_blank"><i className="fab fa-linkedin-in" /></Link>
-                            </div>
+                            {/* Floating Social Share Buttons */}
+                            <SocialShare title={title} slug={data.slug} articleId={article.documentId || article.id} />
                         </figure>
                     )}
                     
