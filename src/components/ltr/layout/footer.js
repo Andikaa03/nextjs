@@ -1,11 +1,12 @@
 
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import ScrollToTopUI from '../scroll-to-top/scroll-to-top';
 import { useBackgroundImageLoader } from '../use-background-image/use-background-image';
 import { getRecentPostArticles } from '@/services/articleService';
-import { getCategories, getTags, getFooterData, getMenuItems, getGlobalSettings } from '@/services/globalService';
+import { getTags, getMenuItems, getGlobalSettings } from '@/services/globalService';
+import { subscribeNewsletter } from '@/services/newsletterService';
 import { getStrapiMedia, formatDate, toBengaliNumber, getStrapiLocale } from '@/lib/strapi';
 import { useLanguage } from '@/lib/LanguageContext';
 
@@ -39,6 +40,11 @@ const dictionary = {
       contact: "Contact",
       donation: "Donation",
       faq: "FAQ"
+    },
+    newsletter: {
+      success: "Subscribed successfully!",
+      duplicate: "This email is already subscribed.",
+      error: "Subscription failed. Please try again."
     }
   },
   bn: {
@@ -70,6 +76,11 @@ const dictionary = {
       contact: "যোগাযোগ",
       donation: "অনুদান",
       faq: "প্রশ্নাবলী"
+    },
+    newsletter: {
+      success: "সফলভাবে সাবস্ক্রাইব হয়েছে!",
+      duplicate: "এই ইমেইল ইতিমধ্যে সাবস্ক্রাইব করা আছে।",
+      error: "সাবস্ক্রিপশন ব্যর্থ হয়েছে। আবার চেষ্টা করুন।"
     }
   }
 };
@@ -86,6 +97,45 @@ const Footer = ({ hideMiddleHeader = false }) => {
   const [globalSettings, setGlobalSettings] = useState(null);
   const [footerMenuItems, setFooterMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Newsletter form state
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterSubmitting, setNewsletterSubmitting] = useState(false);
+  const [newsletterMessage, setNewsletterMessage] = useState(null);
+  const [newsletterSuccess, setNewsletterSuccess] = useState(false);
+  const turnstileRef = useRef(null);
+  const [turnstileToken, setTurnstileToken] = useState(null);
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+
+  // Load Cloudflare Turnstile script
+  useEffect(() => {
+    if (!turnstileSiteKey) return;
+    if (document.getElementById('cf-turnstile-script')) return;
+    const script = document.createElement('script');
+    script.id = 'cf-turnstile-script';
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+  }, [turnstileSiteKey]);
+
+  // Render Turnstile widget after script loads
+  useEffect(() => {
+    if (!turnstileSiteKey || !turnstileRef.current) return;
+    const interval = setInterval(() => {
+      if (window.turnstile && turnstileRef.current) {
+        clearInterval(interval);
+        window.turnstile.render(turnstileRef.current, {
+          sitekey: turnstileSiteKey,
+          callback: (token) => setTurnstileToken(token),
+          'expired-callback': () => setTurnstileToken(null),
+          theme: 'dark',
+          size: 'compact',
+        });
+      }
+    }, 200);
+    return () => clearInterval(interval);
+  }, [turnstileSiteKey, loading]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -170,20 +220,51 @@ const Footer = ({ hideMiddleHeader = false }) => {
               </p>
             </div>
             <div className="col-md-4">
-              {/* Form */}
-              <form className="row row-cols-lg-auto g-2 align-items-center justify-content-end">
+              {/* Newsletter Form */}
+              <form className="row row-cols-lg-auto g-2 align-items-center justify-content-end" onSubmit={async (e) => {
+                e.preventDefault();
+                if (!newsletterEmail || newsletterSubmitting) return;
+                setNewsletterSubmitting(true);
+                setNewsletterMessage(null);
+                const result = await subscribeNewsletter(newsletterEmail, 'footer', turnstileToken);
+                if (result.success) {
+                  setNewsletterSuccess(true);
+                  setNewsletterMessage(t.newsletter.success);
+                  setNewsletterEmail('');
+                  // Reset Turnstile
+                  if (window.turnstile && turnstileRef.current) {
+                    window.turnstile.reset(turnstileRef.current);
+                    setTurnstileToken(null);
+                  }
+                } else if (result.error === 'duplicate') {
+                  setNewsletterSuccess(false);
+                  setNewsletterMessage(t.newsletter.duplicate);
+                } else {
+                  setNewsletterSuccess(false);
+                  setNewsletterMessage(t.newsletter.error);
+                }
+                setNewsletterSubmitting(false);
+              }}>
                 <div className="col-12">
                     <input
                       type="email"
                       className="form-control"
                       placeholder={footerAttrs?.newsletterPlaceholder || t.subscribe.placeholder}
+                      value={newsletterEmail}
+                      onChange={(e) => setNewsletterEmail(e.target.value)}
+                      required
                     />
                   </div>
                   <div className="col-12">
-                    <button type="submit" className="btn btn-news m-0">
-                      {footerAttrs?.newsletterButtonText || t.subscribe.btn}
+                    <button type="submit" className="btn btn-news m-0" disabled={newsletterSubmitting}>
+                      {newsletterSubmitting ? '...' : (footerAttrs?.newsletterButtonText || t.subscribe.btn)}
                     </button>
                 </div>
+                {turnstileSiteKey && (
+                  <div className="col-12 mt-2">
+                    <div ref={turnstileRef}></div>
+                  </div>
+                )}
                 <div className="form-text mt-2 text-white">
                   {(() => {
                     const text = footerAttrs?.newsletterText;
@@ -220,6 +301,11 @@ const Footer = ({ hideMiddleHeader = false }) => {
                     );
                   })()}
                 </div>
+                {newsletterMessage && (
+                  <div className={`form-text mt-2 ${newsletterSuccess ? 'text-success' : 'text-warning'}`}>
+                    {newsletterMessage}
+                  </div>
+                )}
               </form>
             </div>
           </div>
