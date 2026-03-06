@@ -138,12 +138,12 @@ function SliderItem({ article, categoryName }) {
     return (
         <div className="item">
             <div className="slider-post post-height-1">
-                <Link href={`/article/${slug}`} className="news-image">
+                <Link href={`/article/${slug}`} className="news-image" style={{ display: 'block', width: '100%', height: '100%' }}>
                     <img
                         src={coverUrl}
                         alt={title}
                         className="img-fluid"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', minHeight: '400px' }}
+                        style={{ width: '100%', height: '460px', objectFit: 'cover' }}
                         onError={(e) => { e.target.src = '/default.jpg'; e.target.onerror = null; }}
                     />
                 </Link>
@@ -173,12 +173,13 @@ function GridItem({ article, categoryName }) {
     return (
         <div className="col-6 col-sm-6 thm-padding">
             <div className="slider-post post-height-2">
-                <Link href={`/article/${slug}`} className="news-image">
-                    <ImageWithFallback
+                <Link href={`/article/${slug}`} className="news-image" style={{ display: 'block', width: '100%', height: '100%' }}>
+                    <img
                         src={coverUrl}
                         alt={title}
                         className="img-fluid"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', minHeight: '190px' }}
+                        style={{ width: '100%', height: '229px', objectFit: 'cover' }}
+                        onError={(e) => { e.target.src = '/default.jpg'; e.target.onerror = null; }}
                     />
                 </Link>
                 <div className="post-text">
