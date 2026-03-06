@@ -1760,13 +1760,14 @@ figure img {
     clear: both;
     color: #fff;
     display: inline-block;
-    font-size: 12px;
+    font-size: 11px;
     margin-bottom: 7px;
-    padding: 0px 8px;
+    padding: 2px 6px;
     background-color: #eb0254;
     letter-spacing: 0.5px;
-    line-height: 18px;
+    line-height: 14px;
     text-transform: uppercase;
+    border-radius: 2px;
 }
 
 .post-text h2,
@@ -7958,9 +7959,9 @@ h3, .h3, .section-title { font-size: 21px !important; }
 }
 
 .slider-post .post-category {
-    font-size: 17px !important;
-    line-height: 24px !important;
-    padding: 2px 12px !important;
+    font-size: 12px !important;
+    line-height: 18px !important;
+    padding: 2px 8px !important;
 }
 
 /* Category small news title: 17-18px */
