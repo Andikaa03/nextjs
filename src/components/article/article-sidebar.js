@@ -174,13 +174,13 @@ const ArticleSidebar = ({ mostViewed, popularNews, globalSettings: rawGlobalSett
                             </Link>
                           </li>
                         </ul>
+                        {data.rating > 0 && (
                         <div className="reatting-2">
-                          <i className="fas fa-star" />
-                          <i className="fas fa-star" />
-                          <i className="fas fa-star" />
-                          <i className="fas fa-star-half-alt" />
-                          <i className="far fa-star" />
+                          {[1,2,3,4,5].map(star => (
+                            <i key={star} className={`fas ${data.rating >= star ? 'fa-star' : data.rating >= star - 0.5 ? 'fa-star-half-alt' : 'far fa-star'}`} />
+                          ))}
                         </div>
+                        )}
                       </div>
                     );
                 })

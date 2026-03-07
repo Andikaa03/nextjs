@@ -550,10 +550,13 @@ const CategoryPage = () => {
                                                                         </li>
                                                                     )}
                                                                 </ul>
+                                                                {a.rating > 0 && (
                                                                 <div className="reatting-2">
-                                                                    <i className="fas fa-star" /><i className="fas fa-star" /><i className="fas fa-star" />
-                                                                    <i className="fas fa-star-half-alt" /><i className="far fa-star" />
+                                                                    {[1,2,3,4,5].map(star => (
+                                                                        <i key={star} className={`fas ${a.rating >= star ? 'fa-star' : a.rating >= star - 0.5 ? 'fa-star-half-alt' : 'far fa-star'}`} />
+                                                                    ))}
                                                                 </div>
+                                                                )}
                                                             </div>
                                                         );
                                                     })

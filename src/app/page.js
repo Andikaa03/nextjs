@@ -752,7 +752,7 @@ export default function Home() {
                             <div className="img-wrapper">
                               <Link href={a.slug !== '#' ? `/article/${a.slug}` : '#'} className="thumb">
                                 <img src={a.image} alt={a.title} className="img-fluid" onError={(e) => e.target.src = '/default.jpg'} />
-                                <div className="link-icon"><i className={`fa ${i % 2 === 0 ? 'fa-camera' : 'fa-play'}`} /></div>
+                                {a.videoUrl && <div className="link-icon"><i className="fa fa-play" /></div>}
                               </Link>
                             </div>
                             <div className="post-info-2">
