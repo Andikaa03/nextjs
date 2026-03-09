@@ -333,7 +333,7 @@ const Footer = ({ hideMiddleHeader = false }) => {
             {/*  END OF /. FOOTER BOX (Qr Code) */}
             
             {/* START FOOTER BOX (Social Contact - Dynamic) */}
-            <div className="col-sm-6 col-lg-3 footer-box py-4">
+            <div className={hideMiddleHeader ? "col-sm-6 col-lg-4 footer-box py-4" : "col-sm-6 col-lg-3 footer-box py-4"}>
                <h5 className="wiget-title">{footerAttrs?.socialTitle || t.social}</h5>
                 <ul className="list-unstyled m-0 menu-services">
                     {footerAttrs?.socialLinks && footerAttrs.socialLinks.length > 0 ? (
@@ -357,7 +357,7 @@ const Footer = ({ hideMiddleHeader = false }) => {
             {/* END OF /. FOOTER BOX (Social Contact) */}
 
             {/* START FOOTER BOX (Category) */}
-            <div className="col-sm-6 col-lg-3 footer-box py-4">
+            <div className={hideMiddleHeader ? "col-sm-6 col-lg-4 footer-box py-4" : "col-sm-6 col-lg-3 footer-box py-4"}>
               <h5 className="wiget-title">{footerAttrs?.categoryTitle || t.category}</h5>
               <div className="row">
                 <div className="col-6">
@@ -387,7 +387,7 @@ const Footer = ({ hideMiddleHeader = false }) => {
             {/* END OF /. FOOTER BOX (Category) */}
 
             {/* START FOOTER BOX (Recent Post) */}
-            <div className="col-sm-6 col-lg-3 footer-box py-4">
+            <div className={hideMiddleHeader ? "col-sm-6 col-lg-4 footer-box py-4" : "col-sm-6 col-lg-3 footer-box py-4"}>
               <h5 className="wiget-title">{t.recentPost}</h5>
               <div className="footer-news-grid">
                 {recentPosts.map((post, i) => {

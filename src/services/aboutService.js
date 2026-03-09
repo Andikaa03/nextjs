@@ -8,8 +8,6 @@ export async function getAboutData(locale = 'bn') {
       'locale': strapiLocale,
       'populate[heroImage][fields][0]': 'url',
       'populate[heroImage][fields][1]': 'alternativeText',
-      'populate[logo][fields][0]': 'url',
-      'populate[logo][fields][1]': 'alternativeText',
       'populate[teamMembers][populate][photo][fields][0]': 'url',
       'populate[teamMembers][populate][photo][fields][1]': 'alternativeText',
       'populate[teamMembers][populate][socialLinks]': '*',

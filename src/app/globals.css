@@ -8687,6 +8687,7 @@ h3, .h3, .section-title { font-size: 21px !important; }
 .inner-head .breadcrumb li {
     display: inline-block;
     color: #fff;
+    font-size: 20px;
 }
 
 .inner-head .breadcrumb li a {
