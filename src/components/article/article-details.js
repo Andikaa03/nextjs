@@ -131,7 +131,7 @@ const ClientArticleDetail = ({ article, mostViewed, popularNews, globalSettings,
 
                 {/* START RELATED ARTICLES */}
                 {/* START RELATED ARTICLES */}
-                <ArticleRelated articles={mostViewed} locale={locale} />
+                <ArticleRelated articles={mostViewed} locale={locale} articleSlug={data.slug} articleTitle={title} />
                 {/* END OF /. RELATED ARTICLES */}
                 {/* END OF /. RELATED ARTICLES */}
 

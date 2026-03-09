@@ -265,7 +265,7 @@ const Footer = ({ hideMiddleHeader = false }) => {
                     <div ref={turnstileRef}></div>
                   </div>
                 )}
-                <div className="form-text mt-2 text-white">
+                <div className="form-text mt-2 text-white footer-newsletter-text">
                   {(() => {
                     const text = footerAttrs?.newsletterText;
                     // Find Privacy link from menu
@@ -288,7 +288,7 @@ const Footer = ({ hideMiddleHeader = false }) => {
                           </>
                         );
                       }
-                      return text;
+                      return <span dangerouslySetInnerHTML={{ __html: text }} />;
                     }
                     return (
                       <>

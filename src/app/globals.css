@@ -4508,7 +4508,8 @@ abbr[title] {
 
 .post_details_block h2 {
     color: #111;
-    font-weight: 400;
+    font-weight: 700;
+    font-size: 32px;
     margin-bottom: 10px;
 }
 
@@ -4531,6 +4532,37 @@ abbr[title] {
 .post_details_block p,
 .post_details_block .article-p {
     font-size: 16px;
+}
+
+ /* --- Desktop Bengali Typography Overrides --- */
+@media (min-width: 992px) {
+    .page_main_wrapper:not(.locale-en) .post_details_block h2,
+    .page_main_wrapper:not(.locale-en) .post_details_inner .post_details_block h2 {
+        font-size: 32px !important;
+        line-height: 1.4 !important;
+    }
+    
+    .page_main_wrapper:not(.locale-en) .post_details_block p,
+    .page_main_wrapper:not(.locale-en) .post_details_block .article-p,
+    .page_main_wrapper:not(.locale-en) .post_details_block li,
+    .page_main_wrapper:not(.locale-en) .post_details_inner .post_details_block p,
+    .page_main_wrapper:not(.locale-en) .post_details_inner .post_details_block .article-p,
+    .page_main_wrapper:not(.locale-en) .post_details_inner .post_details_block li {
+        font-size: 22px !important;
+        line-height: 1.8 !important;
+    }
+}
+
+.share:hover .wa {
+    color: #25d366;
+    right: 75px;
+    -webkit-transition-delay: 0.2s;
+    -o-transition-delay: 0.2s;
+    transition-delay: 0.2s;
+}
+
+.footer-newsletter-text a {
+    color: #eb0254 !important;
 }
 
 figure.social-icon {
@@ -5403,7 +5435,7 @@ blockquote.no-sign p {
     height: 50px;
     font-size: 15px;
     border-width: 0 0 1px 0;
-    padding: 0;
+    padding: 10px 12px;
     border-color: #e0e0e0;
     border-style: dotted;
 }
