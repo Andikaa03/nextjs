@@ -220,6 +220,7 @@ const TagPage = () => {
     const [loading, setLoading] = useState(true);
     const [isNotFound, setIsNotFound] = useState(false);
     const [tagName, setTagName] = useState('');
+    const [tagDescription, setTagDescription] = useState('');
     const [articles, setArticles] = useState([]);
     const [pagination, setPagination] = useState(null);
     const [mostViewed, setMostViewed] = useState([]);
@@ -250,6 +251,7 @@ const TagPage = () => {
 
                 const name = tagData?.attributes?.name || tagData?.name || slug;
                 setTagName(name);
+                setTagDescription(tagData?.attributes?.description || tagData?.description || '');
                 setArticles(articlesRes?.data || []);
                 setPagination(articlesRes?.meta?.pagination || null);
                 setMostViewed(mostViewedRes?.data || []);
@@ -287,6 +289,9 @@ const TagPage = () => {
                             <h1 className="mb-sm-0">
                                 <strong>{loading ? t.loading : tagName}</strong>
                             </h1>
+                            {tagDescription && (
+                                <p className="mb-0 mt-1 text-muted" style={{ fontSize: '14px' }}>{tagDescription}</p>
+                            )}
                         </div>
                         <div className="col-12 col-sm-auto">
                             <nav aria-label="breadcrumb">

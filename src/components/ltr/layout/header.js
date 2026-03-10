@@ -6,6 +6,7 @@ import { formatDate, getStrapiMedia, toBengaliNumber } from '@/lib/strapi';
 import { getCurrentWeather } from '@/services/weatherService';
 import { getBrowserCoordinates, getIpLocation } from '@/services/locationService';
 import { getMenuItems, getAdsManagement, getHeaderTop } from '@/services/globalService';
+import { getCategoriesWithChildren } from '@/services/categoryService';
 import { useLanguage } from '@/lib/LanguageContext';
 import { WiDaySunny, WiCloud, WiRain, WiSnow, WiThunderstorm, WiFog } from 'weather-icons-react';
 import ThemeChanger from '../style-selectors/style-selector';
@@ -49,6 +50,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
     const [sidebarMenuItems, setSidebarMenuItems] = useState([]);
     const [expandedSidebarItems, setExpandedSidebarItems] = useState({});
     const [sidebarData, setSidebarData] = useState(null);
+    const [categoryTree, setCategoryTree] = useState([]);
 
     const [headerTopData, setHeaderTopData] = useState(null);
     const [adsData, setAdsData] = useState(null);
@@ -89,6 +91,11 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                 setSidebarMenuItems(res?.data || []);
                 setSidebarData(res?.attributes || null);
             }
+        });
+
+        // Fetch categories tree for mega menu
+        getCategoriesWithChildren(locale).then(tree => {
+            setCategoryTree(tree || []);
         });
         
         const fetchHeaderWeather = async () => {
@@ -325,6 +332,43 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
         // Handle Component: Navigation.mega-menu
         if (component === 'navigation.mega-menu') {
             const sections = data.sections || [];
+            
+            // Auto-populate from categories API when no sections are configured
+            if (sections.length === 0 && categoryTree.length > 0) {
+                return (
+                    <li className="nav-item dropdown mega-menu-content d-none d-lg-block" key={index}>
+                        <Link className="nav-link dropdown-toggle" href="#" id={`mega-${index}`} data-bs-toggle="dropdown" aria-expanded="false">
+                            {data.title}
+                        </Link>
+                        <ul className="dropdown-menu mega-menu p-3 megamenu-content" aria-labelledby={`mega-${index}`}>
+                            <li>
+                                <div className="row">
+                                    {categoryTree.map((parent, i) => (
+                                        <div className="col-menu col-md-3" key={i}>
+                                            <h6 className="title">
+                                                <Link href={`/category/${parent.slug}`}>{parent.name}</Link>
+                                            </h6>
+                                            <div className="content">
+                                                <ul className="menu-col">
+                                                    {(parent.children || []).map((child, j) => (
+                                                        <li key={j}>
+                                                            <Link href={`/category/${child.slug}`}>
+                                                                {child.name}
+                                                            </Link>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                );
+            }
+
+            // Manual sections from CMS
             return (
                 <li className="nav-item dropdown mega-menu-content d-none d-lg-block" key={index}>
                     <Link className="nav-link dropdown-toggle" href="#" id={`mega-${index}`} data-bs-toggle="dropdown" aria-expanded="false">

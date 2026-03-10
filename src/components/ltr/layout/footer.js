@@ -50,6 +50,16 @@ const dictionary = {
       address: "Address",
       email: "Email",
       phone: "Phone"
+    },
+    editorial: {
+      title: "Satyadhara Pratidin",
+      office: "Editorial Office",
+      address1: "House 12, Road 7, Dhanmondi",
+      address2: "Dhaka 1209, Bangladesh",
+      phone: "Phone: +880 1712-345678",
+      email: "Email: press@sottyodharaprotidin.com",
+      editor: "Editor:",
+      publisher: "Publisher:"
     }
   },
   bn: {
@@ -91,6 +101,16 @@ const dictionary = {
       address: "ঠিকানা",
       email: "ইমেইল",
       phone: "ফোন"
+    },
+    editorial: {
+      title: "সত্যধারা প্রতিদিন",
+      office: "সম্পাদকীয় কার্যালয়",
+      address1: "হাউস ১২, রোড ৭, ধানমন্ডি",
+      address2: "ঢাকা ১২০৯, বাংলাদেশ",
+      phone: "ফোন: +৮৮০ ১৭১২-৩৪৫৬৭৮",
+      email: "ইমেইল: press@sottyodharaprotidin.com",
+      editor: "সম্পাদক:",
+      publisher: "প্রকাশক:"
     }
   }
 };
@@ -366,6 +386,18 @@ const Footer = ({ hideMiddleHeader = false }) => {
                         </>
                     )}
                 </ul>
+
+                {/* Editorial Office Info */}
+                <div className="mt-4 text-white" style={{ fontSize: '14px', lineHeight: '1.6' }}>
+                  <h5 className="wiget-title">{footerAttrs?.editorialName || t.editorial.title}</h5>
+                  <p className="mb-0">{footerAttrs?.editorialOffice || t.editorial.office}</p>
+                  <p className="mb-0">{footerAttrs?.editorialAddress1 || t.editorial.address1}</p>
+                  <p className="mb-0">{footerAttrs?.editorialAddress2 || t.editorial.address2}</p>
+                  <p className="mb-0">{footerAttrs?.editorialPhone || t.editorial.phone}</p>
+                  <p className="mb-0">{footerAttrs?.editorialEmail || t.editorial.email}</p>
+                  <p className="mb-0">{footerAttrs?.editorialEditor || t.editorial.editor}</p>
+                  <p className="mb-0">{footerAttrs?.editorialPublisher || t.editorial.publisher}</p>
+                </div>
             </div>
             {/* END OF /. FOOTER BOX (Social Contact) */}
 
@@ -439,24 +471,7 @@ const Footer = ({ hideMiddleHeader = false }) => {
 
           </div>
 
-          <div className="row mt-1 mb-0 pb-0">
-            <div className="col-12 text-start">
-              <div className="contact-info text-white">
-                <p className="mb-0" style={{ fontSize: '14px', lineHeight: '1.4' }}>
-                  <i className="fa fa-map-marker me-2"></i>
-                  <strong>{t.contact.address}:</strong> {footerAttrs?.contactAddress || "-"}
-                </p>
-                <p className="mb-0" style={{ fontSize: '14px', lineHeight: '1.4' }}>
-                  <i className="fa fa-envelope me-2"></i>
-                  <strong>{t.contact.email}:</strong> <a href={`mailto:${footerAttrs?.contactEmail || ""}`} className="text-white">{footerAttrs?.contactEmail || "-"}</a>
-                </p>
-                <p className="mb-0" style={{ fontSize: '14px', lineHeight: '1.4' }}>
-                  <i className="fa fa-phone me-2"></i>
-                  <strong>{t.contact.phone}:</strong> <a href={`tel:${footerAttrs?.contactPhone || ""}`} className="text-white">{footerAttrs?.contactPhone || "-"}</a>
-                </p>
-              </div>
-            </div>
-          </div>
+
 
         </div>
       </footer>
