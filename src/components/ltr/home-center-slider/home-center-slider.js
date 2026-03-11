@@ -10,11 +10,13 @@ const dictionary = {
   en: {
     news: 'News',
     editor: 'Editor',
+    by: 'By',
     loading: 'Loading...'
   },
   bn: {
     news: 'সংবাদ',
     editor: 'সম্পাদক',
+    by: 'লিখেছেন:',
     loading: 'লোড হচ্ছে...'
   }
 };
@@ -84,7 +86,7 @@ const HomeCenterSlider = ({ data = [], isLoading = false }) => {
                   <li className="post-atuthor-list">
                     <div className="post-atuthor">
                       <span>
-                        By <Link href="#">{authorName}</Link>
+                        {t.by} <Link href="#">{authorName}</Link>
                       </span>
                     </div>
                   </li>

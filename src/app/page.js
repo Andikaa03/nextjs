@@ -95,7 +95,7 @@ const dictionary = {
     topNews: 'শীর্ষ সংবাদ',
     mostRead: 'সর্বাধিক পঠিত',
     popularNews: 'জনপ্রিয় সংবাদ',
-    by: 'By',
+    by: 'লিখেছেন:',
     editor: 'সম্পাদক',
     news: 'সংবাদ',
     trendingTopics: 'ট্রেন্ডিং বিষয়',
@@ -897,7 +897,7 @@ export default function Home() {
                               <h4><Link href={`/article/${a.slug}`} className="title">{a.title}</Link></h4>
                               <ul className="align-items-center authar-info d-flex flex-wrap gap-1">
                                 <li><span className="post-category mb-0">{a.category}</span></li>
-                                <li>By <span className="editor-name">{a.author}</span></li>
+                                <li>{t.by} <span className="editor-name">{a.author}</span></li>
                                 <li>{fmtDate(a.date, locale)}</li>
                               </ul>
                               <p className="d-lg-block d-none">{a.excerpt}</p>

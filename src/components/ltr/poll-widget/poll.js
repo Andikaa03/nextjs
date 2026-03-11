@@ -113,7 +113,7 @@ const PollWidget = ({ data = null, isLoading = false }) => {
             </div>
             <div className="panel_body poll-content">
                 <form id="home_poll" onSubmit={handleVote}>
-                    <h5 className="mb-3" style={{ fontSize: '22px', fontWeight: 'bold', lineHeight: '1.4' }}>{pollData.question}</h5>
+                    <h5 className="mb-3 poll-question" style={{ fontSize: '26px', fontWeight: 'bold', lineHeight: '1.4' }}>{pollData.question}</h5>
                     <ul>
                         {pollData.options.map((option, index) => {
                             const totalVotes = pollData.options.reduce((sum, opt) => sum + (opt.voteCount || opt.votes || 0), 0);
@@ -128,9 +128,9 @@ const PollWidget = ({ data = null, isLoading = false }) => {
                                         checked={selectedOption === index}
                                         onChange={() => setSelectedOption(index)}
                                         disabled={hasVoted || isVoting}
-                                        style={{ marginRight: '8px' }}
+                                        style={{ marginRight: '10px', transform: 'scale(1.5)', accentColor: '#eb0254' }}
                                     />
-                                    <label htmlFor={`poll_${index}`} style={{ cursor: hasVoted ? 'default' : 'pointer', width: '90%' }}>
+                                    <label htmlFor={`poll_${index}`} style={{ cursor: hasVoted ? 'default' : 'pointer', width: '90%', fontSize: '20px', fontWeight: '500' }}>
                                         {option.text || option.optionText} 
                                         {hasVoted && (
                                             <div style={{ marginTop: '5px', width: '100%', backgroundColor: '#eee', borderRadius: '4px', height: '10px' }}>

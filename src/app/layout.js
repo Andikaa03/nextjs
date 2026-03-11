@@ -14,11 +14,7 @@ export async function generateMetadata() {
     const attrs = globalRes?.data?.attributes || globalRes?.data || {};
     const seo = attrs.defaultSeo || {};
     
-    // Strapi v5: favicon is flat on attrs, not under .data.attributes
-    const faviconData = attrs.favicon?.data?.attributes || attrs.favicon;
-    const faviconUrl = faviconData?.url 
-      ? (faviconData.url.startsWith('http') ? faviconData.url : `${process.env.NEXT_PUBLIC_STRAPI_URL || process.env.NEXT_PUBLIC_STRAPI_API_URL || 'http://localhost:1337'}${faviconData.url}`)
-      : null;
+    const faviconUrl = getStrapiMedia(attrs.favicon, null);
 
     const defaultIcons = {
       icon: [

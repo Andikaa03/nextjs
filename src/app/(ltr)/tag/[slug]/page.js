@@ -45,7 +45,7 @@ const dictionary = {
         subscribers: "সাবস্ক্রাইবার",
         fans: "ফ্যান",
         noNews: "এই ট্যাগে কোনো সংবাদ পাওয়া যায়নি।",
-        by: "by"
+        by: "লিখেছেন:"
     }
 };
 
@@ -103,6 +103,8 @@ function ArticleCard({ article, locale }) {
     const date = formatDate(a.publishedAt || a.createdAt, locale);
     const catName = a.category?.data?.attributes?.name || a.category?.name || '';
     const authorName = a.author?.data?.attributes?.name || a.author?.name || '';
+    const { locale: currentLocale } = useLanguage();
+    const t = dictionary[currentLocale] || dictionary.bn;
 
     return (
         <article>
@@ -122,7 +124,7 @@ function ArticleCard({ article, locale }) {
                 <h3><Link href={`/article/${slug}`}>{title}</Link></h3>
                 <ul className="authar-info d-flex flex-wrap">
                     {date && <li><i className="ti ti-timer" /> {date}</li>}
-                    {authorName && <li className="authar d-lg-block d-none"><a href="#">by {authorName}</a></li>}
+                    {authorName && <li className="authar d-lg-block d-none"><a href="#">{t.by} {authorName}</a></li>}
                 </ul>
             </div>
         </article>
@@ -137,6 +139,8 @@ function SliderItem({ article, locale }) {
     const date = formatDate(a.publishedAt || a.createdAt, locale);
     const catName = a.category?.data?.attributes?.name || a.category?.name || '';
     const authorName = a.author?.data?.attributes?.name || a.author?.name || '';
+    const { locale: currentLocale } = useLanguage();
+    const t = dictionary[currentLocale] || dictionary.bn;
     const views = a.viewCount || 0;
 
     return (
@@ -154,7 +158,7 @@ function SliderItem({ article, locale }) {
                     <span className="post-category">{catName}</span>
                     <h2><Link href={`/article/${slug}`}>{title}</Link></h2>
                     <ul className="authar-info d-flex flex-wrap">
-                        {authorName && <li className="authar"><a href="#">by {authorName}</a></li>}
+                        {authorName && <li className="authar"><a href="#">{t.by} {authorName}</a></li>}
                         {date && <li className="date">{date}</li>}
                         {views > 0 && <li className="view"><a href="#">{views} views</a></li>}
                     </ul>
@@ -172,6 +176,8 @@ function GridItem({ article, locale }) {
     const date = formatDate(a.publishedAt || a.createdAt, locale);
     const catName = a.category?.data?.attributes?.name || a.category?.name || '';
     const authorName = a.author?.data?.attributes?.name || a.author?.name || '';
+    const { locale: currentLocale } = useLanguage();
+    const t = dictionary[currentLocale] || dictionary.bn;
 
     return (
         <div className="col-6 col-sm-6 thm-padding">
@@ -188,7 +194,7 @@ function GridItem({ article, locale }) {
                     <span className="post-category">{catName}</span>
                     <h4><Link href={`/article/${slug}`}>{title}</Link></h4>
                     <ul className="authar-info d-flex flex-wrap">
-                        {authorName && <li className="authar d-lg-block d-none"><a href="#">by {authorName}</a></li>}
+                        {authorName && <li className="authar d-lg-block d-none"><a href="#">{t.by} {authorName}</a></li>}
                         {date && <li className="d-md-block d-none">{date}</li>}
                     </ul>
                 </div>

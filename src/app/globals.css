@@ -4550,7 +4550,7 @@ abbr[title] {
 .locale-bn .post_details_block .authar-info.small li,
 .post_details_block .authar-info.small li a,
 .locale-bn .post_details_block .authar-info.small li a {
-    font-size: 16px !important;
+    font-size: 17px !important;
     line-height: 1.2 !important;
 }
 
@@ -7982,7 +7982,7 @@ body.layout-rtl .style-settings-content ul li select {
 .locale-bn .post-date, 
 .locale-bn .post-category, 
 .locale-bn .breadcrumb-item { 
-    font-size: 15px !important; 
+    font-size: 17px !important; 
 }
 
 /* Article card title: 20px */
@@ -8045,7 +8045,7 @@ body.layout-rtl .style-settings-content ul li select {
 .locale-bn .slider-wrapper .slider-post .post-date,
 .locale-bn .slider-wrapper .slider-post .post-atuthor span,
 .locale-bn .slider-wrapper .slider-post .post-atuthor a {
-    font-size: 20px !important;
+    font-size: 17px !important;
     line-height: 1.4 !important;
     font-weight: 400 !important;
 }
@@ -8205,7 +8205,7 @@ body.layout-rtl .style-settings-content ul li select {
 
 .rightSidebar .tabs-wrapper-bn .p-post h4,
 .rightSidebar .tabs-wrapper-bn .authar-info {
-    font-size: 19px !important;
+    font-size: 17px !important;
 }
 
 .rightSidebar .tabs-wrapper-en .p-post h4,
@@ -8274,7 +8274,7 @@ body.layout-rtl .style-settings-content ul li select {
 
 .leftSidebar .tabs-wrapper-bn .p-post h4,
 .leftSidebar .tabs-wrapper-bn .authar-info {
-    font-size: 22px !important;
+    font-size: 17px !important;
 }
 
 .leftSidebar .tabs-wrapper-bn .popular-news .p-post h4,
@@ -8286,7 +8286,7 @@ body.layout-rtl .style-settings-content ul li select {
 
 .leftSidebar .tabs-wrapper-bn .popular-news .p-post .authar-info,
 .leftSidebar .tabs-wrapper-bn .popular-news .p-post .authar-info li {
-    font-size: 19px !important;
+    font-size: 17px !important;
     line-height: 1.45 !important;
 }
 
@@ -8326,7 +8326,7 @@ body.layout-rtl .style-settings-content ul li select {
 
 .leftSidebar .recent-reviews-panel .more-post .authar-info li,
 .leftSidebar .recent-reviews-panel .news-list .post-info-2 h5 .title {
-    font-size: 20px !important;
+    font-size: 17px !important;
     line-height: 1.45 !important;
     font-weight: 400 !important;
 }

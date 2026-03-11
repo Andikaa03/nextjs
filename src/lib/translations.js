@@ -7,7 +7,8 @@ export const translations = {
     home: 'হোম',
     
     // Article Details
-    by: 'রিপোর্ট:',
+    by: 'লিখেছেন:',
+    editor: 'সম্পাদক',
     views: 'ভিউ',
     shareThisPost: 'এই পোস্টটি শেয়ার করুন',
     tags: 'ট্যাগ',
@@ -75,6 +76,7 @@ export const translations = {
     
     // Article Details
     by: 'by',
+    editor: 'Editor',
     views: 'views',
     shareThisPost: 'Share this post',
     tags: 'Tags',

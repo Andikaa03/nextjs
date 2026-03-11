@@ -18,7 +18,7 @@ const ClientArticleDetail = ({ article, mostViewed, popularNews, globalSettings,
   
   const data = article.attributes || article;
   const { title, content, cover, publishedAt, author, views } = data;
-  const authorName = author?.data?.attributes?.name || "Editor";
+  const authorName = author?.data?.attributes?.name || t('editor');
   const imageUrl = getStrapiMedia(cover);
 
   // Resolve global settings for social URLs
