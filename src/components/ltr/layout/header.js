@@ -346,7 +346,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                     {categoryTree.map((parent, i) => (
                                         <div className="col-menu col-md-3" key={i}>
                                             <h6 className="title">
-                                                <Link href={`/category/${parent.slug}`}>{parent.name}</Link>
+                                                <Link href={`/category/${parent.slug}`} style={{ color: '#e6005c' }}>{parent.name}</Link>
                                             </h6>
                                             <div className="content">
                                                 <ul className="menu-col">

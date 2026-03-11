@@ -53,7 +53,7 @@ export async function getCategoriesWithChildren(locale = 'bn') {
       const childrenData = root.children?.data || root.children || [];
       const children = childrenData
         .map(c => c.attributes || c)
-        .filter(c => c.showInMenu === true && c.id !== root.id && !rootIds.has(c.id))
+        .filter(c => c.id !== root.id && !rootIds.has(c.id))
         .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
       return { ...root, children };
     });
