@@ -1696,6 +1696,7 @@ figure img {
 .post-height-1 .news-image img {
     width: 100%;
     height: 460px;
+    object-fit: cover;
 }
 
 
@@ -6563,6 +6564,16 @@ blockquote.no-sign p {
     color: rgba(215, 215, 215, 0.4);
 }
 
+[data-theme=skin-dark] .post-footer .social i,
+[data-theme=skin-dark] .post-footer .social button {
+    color: rgba(215, 215, 215, 0.6);
+}
+
+[data-theme=skin-dark] .post-footer .social i:hover,
+[data-theme=skin-dark] .post-footer .social button:hover {
+    color: #eb0254;
+}
+
 [data-theme=skin-dark] .authar-info li .editor-name {
     color: #fff;
 }
@@ -8098,6 +8109,23 @@ body.layout-rtl .style-settings-content ul li select {
     .locale-bn .slider-post .post-text h4 a {
         font-size: 15px !important;
         line-height: 1.4 !important;
+    }
+
+    /* Carousel main h4 – Bengali mobile override (slightly bigger than side items) */
+    .locale-bn .slider-wrapper .slider-post .post-text h4,
+    .locale-bn .slider-wrapper .slider-post .post-text h4 a {
+        font-size: 18px !important;
+        line-height: 1.35 !important;
+    }
+
+    /* Carousel author info – Bengali mobile override */
+    .locale-bn .slider-wrapper .slider-post .authar-info,
+    .locale-bn .slider-wrapper .slider-post .authar-info li,
+    .locale-bn .slider-wrapper .slider-post .post-date,
+    .locale-bn .slider-wrapper .slider-post .post-atuthor span,
+    .locale-bn .slider-wrapper .slider-post .post-atuthor a {
+        font-size: 16px !important;
+        line-height: 1.3 !important;
     }
 
     /* Carousel blur overlay – reduce padding so image shows more */

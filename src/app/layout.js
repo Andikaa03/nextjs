@@ -5,16 +5,19 @@ import './globals.css'
 import ImportJs from '@/components/ltr/import-js/import-js';
 import Providers from './theme-providers';
 import { getGlobalSettings } from '@/services/globalService';
+import { getStrapiMedia } from '@/lib/strapi';
 
 export async function generateMetadata() {
   try {
     const globalRes = await getGlobalSettings('bn');
-    const attrs = globalRes?.data?.attributes || {};
+    // Strapi v5 flat structure: fields are directly on data, no .attributes wrapper
+    const attrs = globalRes?.data?.attributes || globalRes?.data || {};
     const seo = attrs.defaultSeo || {};
     
-    const faviconData = attrs.favicon?.data?.attributes;
+    // Strapi v5: favicon is flat on attrs, not under .data.attributes
+    const faviconData = attrs.favicon?.data?.attributes || attrs.favicon;
     const faviconUrl = faviconData?.url 
-      ? (faviconData.url.startsWith('http') ? faviconData.url : `${process.env.NEXT_PUBLIC_STRAPI_API_URL || 'http://localhost:1337'}${faviconData.url}`)
+      ? (faviconData.url.startsWith('http') ? faviconData.url : `${process.env.NEXT_PUBLIC_STRAPI_URL || process.env.NEXT_PUBLIC_STRAPI_API_URL || 'http://localhost:1337'}${faviconData.url}`)
       : null;
 
     const defaultIcons = {
@@ -27,14 +30,29 @@ export async function generateMetadata() {
       shortcut: ['/favicon.ico?v=5']
     };
 
+    const metaImage = getStrapiMedia(seo.metaImage || seo.shareImage);
+
     return {
       title: seo.metaTitle || attrs.siteName || 'Satyadhara Pratidin',
       description: seo.metaDescription || attrs.siteDescription || 'সত্যধারা প্রতিদিন - সত্যের সন্ধানে সর্বদা',
+      keywords: seo.keywords || 'news, portal, bangladesh, update',
       icons: faviconUrl ? {
         icon: [{ url: faviconUrl }],
         shortcut: [faviconUrl],
         apple: [faviconUrl]
-      } : defaultIcons
+      } : defaultIcons,
+      openGraph: {
+        title: seo.metaTitle || attrs.siteName || 'Satyadhara Pratidin',
+        description: seo.metaDescription || attrs.siteDescription || 'সত্যধারা প্রতিদিন - সত্যের সন্ধানে সর্বদা',
+        images: metaImage ? [{ url: metaImage }] : [],
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: seo.metaTitle || attrs.siteName || 'Satyadhara Pratidin',
+        description: seo.metaDescription || attrs.siteDescription || 'সত্যধারা প্রতিদিন - সত্যের সন্ধানে সর্বদা',
+        images: metaImage ? [metaImage] : [],
+      }
     };
   } catch (error) {
     return {

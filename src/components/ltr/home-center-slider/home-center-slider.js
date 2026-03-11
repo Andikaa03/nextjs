@@ -77,9 +77,9 @@ const HomeCenterSlider = ({ data = [], isLoading = false }) => {
               </Link>
               <div className="post-text">
                 <span className="post-category">{category}</span>
-                <h1>
+                <h4 className="mb-2">
                   <Link href={isLoading ? '#' : `/article/${slug}`}>{title}</Link>
-                </h1>
+                </h4>
                 <ul className="align-items-center authar-info d-flex flex-wrap gap-1">
                   <li className="post-atuthor-list">
                     <div className="post-atuthor">

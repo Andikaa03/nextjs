@@ -4,7 +4,7 @@ import { fetchAPI, getStrapiLocale } from '@/lib/strapi';
 export async function getGlobalSettings(locale = 'bn') {
   const strapiLocale = getStrapiLocale(locale);
   try {
-    return await fetchAPI(`/global?populate=*&locale=${strapiLocale}`, { silent: true });
+    return await fetchAPI(`/global?populate[0]=favicon&populate[1]=defaultSeo.shareImage&locale=${strapiLocale}`, { silent: true });
   } catch (error) {
     // Silent fallback when global singleton is missing/unpublished/unreachable
     return { data: null };

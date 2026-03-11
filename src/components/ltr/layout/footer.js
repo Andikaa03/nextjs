@@ -388,13 +388,13 @@ const Footer = ({ hideMiddleHeader = false }) => {
                 </ul>
 
                 {/* Editorial Office Info */}
-                <div className="mt-4 text-white" style={{ fontSize: '14px', lineHeight: '1.6' }}>
-                  <h5 className="wiget-title">{footerAttrs?.editorialName || t.editorial.title}</h5>
+                <div className="mt-5 text-white" style={{ fontSize: '14px', lineHeight: '1.6' }}>
+                  <h5 className="wiget-title mb-1">{footerAttrs?.editorialName || t.editorial.title}</h5>
                   <p className="mb-0">{footerAttrs?.editorialOffice || t.editorial.office}</p>
                   <p className="mb-0">{footerAttrs?.editorialAddress1 || t.editorial.address1}</p>
                   <p className="mb-0">{footerAttrs?.editorialAddress2 || t.editorial.address2}</p>
                   <p className="mb-0">{footerAttrs?.editorialPhone || t.editorial.phone}</p>
-                  <p className="mb-0">{footerAttrs?.editorialEmail || t.editorial.email}</p>
+                  <p className="mb-0" style={{ fontSize: '12px', whiteSpace: 'nowrap' }}>{footerAttrs?.editorialEmail || t.editorial.email}</p>
                   <p className="mb-0">{footerAttrs?.editorialEditor || t.editorial.editor}</p>
                   <p className="mb-0">{footerAttrs?.editorialPublisher || t.editorial.publisher}</p>
                 </div>
