@@ -32,7 +32,7 @@ export async function getCategoriesWithChildren(locale = 'bn') {
   const strapiLocale = getStrapiLocale(locale);
   try {
     const res = await fetchAPI(
-      `/categories?populate[children][populate]=*&populate[parent][fields][0]=id&populate[featuredImage]=*&locale=${strapiLocale}&sort=sortOrder:asc,name:asc&pagination[pageSize]=100`
+      `/categories?populate=*&locale=${strapiLocale}&sort=sortOrder:asc,name:asc&pagination[pageSize]=100`
     );
     const allCategories = (res?.data || []).map(c => c.attributes || c);
 
@@ -43,12 +43,15 @@ export async function getCategoriesWithChildren(locale = 'bn') {
       return !hasParent && showInMenu;
     });
 
-    // For each root, attach its children (filter by showInMenu)
+    // Create a Set of root IDs for quick lookup
+    const rootIds = new Set(roots.map(r => r.id));
+
+    // For each root, attach its children (filter by showInMenu and prevent circular refs/roots)
     return roots.map(root => {
       const childrenData = root.children?.data || root.children || [];
       const children = childrenData
         .map(c => c.attributes || c)
-        .filter(c => c.showInMenu !== false)
+        .filter(c => c.showInMenu !== false && !rootIds.has(c.id) && c.id !== root.id)
         .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
       return { ...root, children };
     });
