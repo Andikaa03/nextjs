@@ -53,7 +53,7 @@ const PollWidget = ({ data = null, isLoading = false }) => {
             setPollId(null);
         } else if (data) {
             const p = data.attributes || data;
-            setPollId(data.id || null);
+            setPollId(data.documentId || data.id || null);
             setPollData({
                 question: p.question,
                 options: p.options || []
@@ -86,11 +86,18 @@ const PollWidget = ({ data = null, isLoading = false }) => {
                         localStorage.setItem(`voted_poll_${pollId}`, 'true');
                     }
                     // Update UI optimistically
-                    const updatedOptions = [...pollData.options];
-                    if (updatedOptions[selectedOption]) {
-                         updatedOptions[selectedOption].voteCount = (updatedOptions[selectedOption].voteCount || updatedOptions[selectedOption].votes || 0) + 1;
-                    }
-                    setPollData({...pollData, options: updatedOptions});
+                    setPollData(prev => {
+                        const newOptions = [...prev.options];
+                        const optIdx = parseInt(selectedOption);
+                        if (newOptions[optIdx]) {
+                            // Clone object to ensure re-render
+                            newOptions[optIdx] = {
+                                ...newOptions[optIdx],
+                                voteCount: (newOptions[optIdx].voteCount || newOptions[optIdx].votes || 0) + 1
+                            };
+                        }
+                        return { ...prev, options: newOptions };
+                    });
                 }
             } catch (err) {
                 console.error("Failed to submit vote:", err);
