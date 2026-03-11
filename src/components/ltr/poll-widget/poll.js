@@ -113,7 +113,7 @@ const PollWidget = ({ data = null, isLoading = false }) => {
             </div>
             <div className="panel_body poll-content">
                 <form id="home_poll" onSubmit={handleVote}>
-                    <h6 style={{ fontSize: '18px', marginBottom: '16px', lineHeight: '1.4' }}>{pollData.question}</h6>
+                    <h5 className="mb-3" style={{ fontSize: '22px', fontWeight: 'bold', lineHeight: '1.4' }}>{pollData.question}</h5>
                     <ul>
                         {pollData.options.map((option, index) => {
                             const totalVotes = pollData.options.reduce((sum, opt) => sum + (opt.voteCount || opt.votes || 0), 0);
