@@ -1696,7 +1696,8 @@ figure img {
 .post-height-1 .news-image img {
     width: 100%;
     height: 460px;
-    object-fit: cover;
+    object-fit: contain;
+    object-position: center;
 }
 
 

@@ -24,36 +24,36 @@ export async function getCategoryBySlug(slug, locale = 'bn') {
 }
 
 /**
- * Fetch categories with parent/children relations and build a tree structure.
- * Returns only root (parent) categories, each with a `children` array.
- * Filters out categories where showInMenu is false.
+ * Fetch categories and build a tree structure using the `parentCategory` field.
+ * Returns only root categories (those without a parentCategory), each with a `children` array.
+ * Root categories must have showInMenu === true.
  */
 export async function getCategoriesWithChildren(locale = 'bn') {
   const strapiLocale = getStrapiLocale(locale);
   try {
     const res = await fetchAPI(
-      `/categories?populate=*&locale=${strapiLocale}&sort=sortOrder:asc,name:asc&pagination[pageSize]=100`
+      `/categories?populate=parentCategory&locale=${strapiLocale}&sort=sortOrder:asc,name:asc&pagination[pageSize]=100`
     );
     const allCategories = (res?.data || []).map(c => c.attributes || c);
 
-    // Build tree: Categories without parents or whose parent is themselves are roots.
+    // Identify root categories: no parentCategory and showInMenu === true
     const roots = allCategories.filter(cat => {
       if (cat.showInMenu !== true) return false;
-      const parentId = cat.parent?.id || cat.parent?.data?.id;
+      const parentId = cat.parentCategory?.id || cat.parentCategory?.data?.id;
       if (!parentId) return true;
       if (parentId === cat.id) return true; // Fix circular references
       return false;
     });
 
-    // Create a Set of root IDs for quick lookup
     const rootIds = new Set(roots.map(r => r.id));
 
-    // For each root, attach its children
+    // Build children manually: categories whose parentCategory points to a root
     return roots.map(root => {
-      const childrenData = root.children?.data || root.children || [];
-      const children = childrenData
-        .map(c => c.attributes || c)
-        .filter(c => c.id !== root.id && !rootIds.has(c.id))
+      const children = allCategories
+        .filter(cat => {
+          const parentId = cat.parentCategory?.id || cat.parentCategory?.data?.id;
+          return parentId === root.id && cat.id !== root.id && !rootIds.has(cat.id);
+        })
         .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
       return { ...root, children };
     });
