@@ -121,14 +121,15 @@ export const getTimezoneLocation = async (locale = 'en') => {
 };
 
 export const resolveClientLocation = async (locale = 'en') => {
-  const [browserCoords, ipLocation, timezoneLocation] = await Promise.all([
-    getBrowserCoordinates(),
+  // REMOVED getBrowserCoordinates() from automatic resolution because it
+  // triggers an intrusive permission prompt immediately on page load.
+  const [ipLocation, timezoneLocation] = await Promise.all([
     getIpLocation(),
     getTimezoneLocation(locale),
   ]);
 
-  const lat = browserCoords?.lat ?? ipLocation?.lat ?? timezoneLocation?.lat;
-  const lon = browserCoords?.lon ?? ipLocation?.lon ?? timezoneLocation?.lon;
+  const lat = ipLocation?.lat ?? timezoneLocation?.lat;
+  const lon = ipLocation?.lon ?? timezoneLocation?.lon;
   const fallbackLabel = ipLocation?.label || timezoneLocation?.label || '';
 
   return {

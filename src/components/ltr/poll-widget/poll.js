@@ -88,7 +88,7 @@ const PollWidget = ({ data = null, isLoading = false }) => {
                     // Update UI optimistically
                     const updatedOptions = [...pollData.options];
                     if (updatedOptions[selectedOption]) {
-                         updatedOptions[selectedOption].votes = (updatedOptions[selectedOption].votes || 0) + 1;
+                         updatedOptions[selectedOption].voteCount = (updatedOptions[selectedOption].voteCount || updatedOptions[selectedOption].votes || 0) + 1;
                     }
                     setPollData({...pollData, options: updatedOptions});
                 }
@@ -113,11 +113,11 @@ const PollWidget = ({ data = null, isLoading = false }) => {
             </div>
             <div className="panel_body poll-content">
                 <form id="home_poll" onSubmit={handleVote}>
-                    <h6>{pollData.question}</h6>
+                    <h6 style={{ fontSize: '18px', marginBottom: '16px', lineHeight: '1.4' }}>{pollData.question}</h6>
                     <ul>
                         {pollData.options.map((option, index) => {
-                            const totalVotes = pollData.options.reduce((sum, opt) => sum + (opt.votes || 0), 0);
-                            const percent = totalVotes > 0 ? Math.round(((option.votes || 0) / totalVotes) * 100) : 0;
+                            const totalVotes = pollData.options.reduce((sum, opt) => sum + (opt.voteCount || opt.votes || 0), 0);
+                            const percent = totalVotes > 0 ? Math.round(((option.voteCount || option.votes || 0) / totalVotes) * 100) : 0;
                             return (
                                 <li key={option.id || index}>
                                     <input
@@ -135,7 +135,7 @@ const PollWidget = ({ data = null, isLoading = false }) => {
                                         {hasVoted && (
                                             <div style={{ marginTop: '5px', width: '100%', backgroundColor: '#eee', borderRadius: '4px', height: '10px' }}>
                                                 <div style={{ width: `${percent}%`, backgroundColor: '#eb0254', height: '10px', borderRadius: '4px' }}></div>
-                                                <span style={{ fontSize: '11px', float: 'right', marginTop: '2px' }}>{percent}% ({option.votes || 0})</span>
+                                                <span style={{ fontSize: '11px', float: 'right', marginTop: '2px' }}>{percent}% ({option.voteCount || option.votes || 0})</span>
                                             </div>
                                         )}
                                     </label>
