@@ -41,12 +41,7 @@ const ClientArticleDetail = ({ article, mostViewed, popularNews, globalSettings,
         <div className="page-title">
           <div className="container">
             <div className="align-items-center row">
-              <div className="col">
-                <h1 className="mb-sm-0">
-                  {/* <strong>Post Style</strong> One */}
-                  {data.category?.data?.attributes?.name || "News"}
-                </h1>
-              </div>
+     
               <div className="col-12 col-sm-auto">
                 <nav aria-label="breadcrumb">
                   <ol className="breadcrumb d-inline-block">

@@ -45,7 +45,7 @@ const PrivacyPolicyPage = () => {
         fetchData();
     }, [locale]);
 
-    const heroImageUrl = getStrapiMedia(privacyData?.heroImage) || 'assets/images/about-bg.jpg';
+    const heroImageUrl = getStrapiMedia(privacyData?.heroImage) || '/assets/images/about-bg.jpg';
 
     return (
         <Layout hideMiddleHeader={true} globalSettings={globalSettings}>

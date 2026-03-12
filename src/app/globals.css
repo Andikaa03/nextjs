@@ -5867,7 +5867,7 @@ blockquote.no-sign p {
 }
 
 .date-text-bn {
-    font-size: 18px;
+    font-size: 20px;
 }
 
 @media (max-width: 767px) {
@@ -7972,11 +7972,20 @@ body.layout-rtl .style-settings-content ul li select {
     font-size: 19px !important;
 }
 
-/* 5. Menu / Navigation Bar: 16-18px */
-.locale-bn .navbar-nav .nav-link, 
+/* 5. Menu / Navigation Bar */
+.locale-bn .navbar-nav > .nav-item > .nav-link,
+.locale-bn .navbar-nav .dropdown-menu.megamenu-content .title {
+    font-size: 20px !important;
+}
+
+.locale-bn .navbar-nav .dropdown-menu.megamenu-content .menu-col li a {
+    font-size: 16px !important;
+}
+
+/* Revert regular dropdowns and sidebar to 17px */
 .locale-bn .navbar-nav .dropdown-item,
-.locale-bn #sidebar .nav-link { 
-    font-size: 17px !important; 
+.locale-bn #sidebar .nav-link {
+    font-size: 17px !important;
 }
 
 /* 6. Meta text (Byline, Date, Category): 14-15px */
@@ -7987,10 +7996,66 @@ body.layout-rtl .style-settings-content ul li select {
     font-size: 17px !important; 
 }
 
-/* Article card title: 20px */
+/* Article card title & Poll Question: 20px */
 .locale-bn .news-list-item .post-info-2 h4 .title,
-.locale-bn .news-list-item h4 a { 
-    font-size: 20px !important; 
+.locale-bn .news-list-item h4 a,
+.locale-bn .poll-content h5,
+.locale-bn .poll-content label { 
+    font-size: 24px !important; 
+}
+
+/* Desktop: enlarge Recent Reviews section for Bangla */
+.locale-bn .recent-reviews-panel .panel_header h4,
+.locale-bn .recent-reviews-panel .panel_header h4 strong {
+    font-size: 26px !important;
+}
+
+.locale-bn .recent-reviews-panel .more-post h4 {
+    font-size: 18px !important;
+    margin-top: 6px !important;
+}
+
+.locale-bn .recent-reviews-panel .more-post .authar-info li {
+    font-size: 17px !important;
+}
+
+.locale-bn .recent-reviews-panel .more-post .authar-info .post-category {
+    padding: 4px 10px !important;
+}
+
+.locale-bn .recent-reviews-panel .news-list-item .post-info-2 h5,
+.locale-bn .recent-reviews-panel .news-list-item .post-info-2 h5 a {
+    font-size: 20px !important;
+}
+
+/* Mobile: enlarge Recent Reviews section for Bangla */
+@media (max-width: 767px) {
+    .locale-bn .recent-reviews-panel .panel_header h4,
+    .locale-bn .recent-reviews-panel .panel_header h4 strong {
+        font-size: 28px !important;
+    }
+
+    .locale-bn .recent-reviews-panel .more-post h4 {
+        font-size: 26px !important;
+        margin-top: 8px !important;
+    }
+
+    .locale-bn .recent-reviews-panel .more-post .authar-info li {
+        font-size: 18px !important;
+    }
+
+    .locale-bn .recent-reviews-panel .more-post .authar-info .post-category {
+        padding: 4px 12px !important;
+    }
+
+    .locale-bn .recent-reviews-panel .more-post .authar-info {
+        gap: 8px !important;
+    }
+
+    .locale-bn .recent-reviews-panel .news-list-item .post-info-2 h5,
+    .locale-bn .recent-reviews-panel .news-list-item .post-info-2 h5 a {
+        font-size: 18px !important;
+    }
 }
 
 /* Homepage lead news title: 30-32px */
@@ -8513,7 +8578,7 @@ body.layout-rtl .style-settings-content ul li select {
 }
 
 .recent-articles-panel.recent-articles-panel-bn .recent-articles-title {
-    font-size: 36px !important;
+    font-size: 20px !important;
     line-height: 1.25 !important;
 }
 

@@ -52,7 +52,7 @@ const AboutPage = () => {
         fetchData();
     }, [locale]);
 
-    const heroImageUrl = getStrapiMedia(aboutData?.heroImage) || 'assets/images/about-bg.jpg';
+    const heroImageUrl = getStrapiMedia(aboutData?.heroImage) || '/assets/images/about-bg.jpg';
     const teamMembers = aboutData?.teamMembers || [];
 
     return (

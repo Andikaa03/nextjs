@@ -426,7 +426,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                         <Link className="video-nav-item" href={videoUrl}>
                                             <div className="img-wrapper">
                                                 <img
-                                                    src={getStrapiMedia(video.thumbnail) || "assets/images/gallery-235x160-1.jpg"}
+                                                    src={getStrapiMedia(video.thumbnail) || "/assets/images/gallery-235x160-1.jpg"}
                                                     alt={video.title}
                                                     className="img-fluid"
                                                 />
@@ -594,7 +594,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                 <div className="col-sm-4">
                                     <Link href="/" className="header-logo">
                                         <img
-                                            src={headerLogo || "assets/images/logo.png"}
+                                            src={headerLogo || "/assets/images/logo.png"}
                                             className="img-fluid header-logo"
                                             alt="Logo"
                                             style={{ width: '180px', height: '45px', objectFit: 'contain' }}
@@ -634,7 +634,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                         </div>
                                         <Link href="/" className="header-logo" >
                                             <img 
-                                                src={headerLogo || "assets/images/logo.png"} 
+                                                src={headerLogo || "/assets/images/logo.png"} 
                                                 alt="Logo" 
                                                 style={{ width: '210px', height: '56px', objectFit: 'contain' }}
                                             />
@@ -694,7 +694,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                     <div className="container position-relative">
                         <Link className="navbar-brand d-md-none" href="/">
                             <img 
-                                src={headerLogo || "assets/images/logo.png"} 
+                                src={headerLogo || "/assets/images/logo.png"} 
                                 alt="Logo" 
                                 style={{ width: '150px', height: '40px', objectFit: 'contain' }}
                             />
@@ -710,7 +710,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                 <div className="collapse-brand flex-shrink-0">
                                     <Link href="/">
                                         <img 
-                                            src={headerLogo || "assets/images/logo.png"} 
+                                            src={headerLogo || "/assets/images/logo.png"} 
                                             alt="Logo" 
                                             style={{ width: '150px', height: '40px', objectFit: 'contain' }}
                                         />
@@ -756,7 +756,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                 ) : globalSettings?.data?.attributes?.favicon?.data ? (
                                     <img src={getStrapiMedia(globalSettings.data.attributes.favicon)} alt={globalSettings?.data?.attributes?.siteName || "Logo"} height={50} />
                                 ) : (
-                                    <img src="assets/images/logo-white.png" alt="Logo" height={50} />
+                                    <img src="/assets/images/logo-white.png" alt="Logo" height={50} />
                                 )}
                             </Link>
                             <p className="sidebar-description">

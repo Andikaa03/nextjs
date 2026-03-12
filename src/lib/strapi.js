@@ -118,16 +118,36 @@ export function formatDate(dateString, localeArg) {
   const date = new Date(dateString);
   const locale = localeArg || 'bn'; 
   
-  const formatted = date.toLocaleDateString(locale, {
+  const options = {
+    weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-  });
-
-  // Force Bengali numerals if locale is 'bn' or 'bn-BD'
-  if (locale.startsWith('bn')) {
-    return toBengaliNumber(formatted);
-  }
+  };
   
-  return formatted;
+  if (locale === 'en') {
+    return date.toLocaleDateString('en-US', options);
+  }
+
+  // Bengali locale
+  const formattedGregorian = date.toLocaleDateString('bn-BD', options);
+  const gregorianParts = formattedGregorian.split(', ');
+  const weekday = gregorianParts.length > 1 ? gregorianParts[0] : '';
+  const datePart = gregorianParts.length > 1 ? gregorianParts.slice(1).join(' ') : formattedGregorian;
+  
+  // Convert to Bengali Date
+  try {
+    const { BanglaDateConverter } = require('bangla-date-converter');
+    // Ensure accurate offset handling by creating a new date locally
+    // to match Bangladesh time just in case.
+    const converter = new BanglaDateConverter(date);
+    const banglaDate = converter.format('DD MMMM YYYY').replace(',', '');
+    
+    // Day name, english calendar, bangla calendar
+    const finalDateStr = `${weekday}, ${datePart}, ${banglaDate}`;
+    return toBengaliNumber(finalDateStr);
+  } catch (err) {
+    console.error('Error formatting bangla date:', err);
+    return toBengaliNumber(formattedGregorian);
+  }
 }
