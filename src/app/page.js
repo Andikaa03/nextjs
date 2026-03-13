@@ -374,7 +374,7 @@ export default function Home() {
         <section className="slider-inner">
           <div className="container-fluid p-0">
             <div className="row thm-margin">
-              <div className="col-md-4 col-xxl-4 thm-padding d-md-none d-xxl-block">
+              <div className="col-md-4 col-xxl-4 thm-padding d-none d-xxl-block">
                 <div className="row slider-right-post thm-margin">
                   {(displayFeatured.length > 0 ? displayFeatured.slice(0, 2) : []).map((article, i) => {
                     const a = getArt(article, locale);
@@ -431,7 +431,7 @@ export default function Home() {
                   {(displayLatest.length > 0 ? displayLatest.slice(0, 3) : []).map((article, i) => {
                     const a = getArt(article, locale);
                     return (
-                      <div key={a.id || `right-${i}`} className={`${i === 0 ? 'col-md-12 col-sm-12 d-md-block d-none' : 'col-6 col-sm-6'} thm-padding`}>
+                      <div key={a.id || `right-${i}`} className={`${i === 0 ? 'col-md-12 col-sm-12 d-md-block d-none' : 'col-6 col-sm-6 d-none d-md-block'} thm-padding`}>
                         <div className={`slider-post ${i === 0 ? 'post-height-2' : 'post-height-2'}`}>
                           <Link href={`/article/${a.slug}`} className="news-image">
                             <img src={a.image} alt={a.title} className="img-fluid" onError={(e) => e.target.src = '/default.jpg'} />

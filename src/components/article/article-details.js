@@ -79,14 +79,11 @@ const ClientArticleDetail = ({ article, mostViewed, popularNews, globalSettings,
                     )}
                     
                     <h2>{title}</h2>
-                    <ul className="authar-info d-flex flex-wrap align-items-center small gap-3">
-                      <li>
-                        <Link href="#" className="link">
-                          <span className="fw-semibold">{t('by')}</span> {authorName}
-                        </Link>
-                      </li>
-                      <li><i className="far fa-clock me-1"></i>{formatDate(publishedAt, locale)}</li>
-                    </ul>
+                    <div className="article-meta-info">
+                      <span className="meta-item author">{t('by')} {authorName}</span>
+                      <span className="meta-separator">|</span>
+                      <span className="meta-item date">{formatDate(publishedAt, locale)}</span>
+                    </div>
 
                     {videoEmbedUrl && (
                         <div className="mb-4 position-relative" style={{ paddingBottom: '56.25%', height: 0 }}>
