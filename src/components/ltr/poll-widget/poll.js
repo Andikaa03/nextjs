@@ -33,16 +33,26 @@ const PollWidget = ({ data = null, isLoading = false }) => {
     const { locale } = useLanguage();
     const t = dictionary[locale] || dictionary.bn;
     
-    const dummyPoll = {
-        question: t.dummyQuestion,
-        options: t.dummyOptions
+    // Initialize state only once but allow props to override
+    const getInitialPoll = () => {
+        if (data) {
+            const p = data.attributes || data;
+            return {
+                question: p.question,
+                options: p.options || []
+            };
+        }
+        return {
+            question: t.dummyQuestion,
+            options: t.dummyOptions
+        };
     };
 
-    const [pollData, setPollData] = useState(dummyPoll);
+    const [pollData, setPollData] = useState(getInitialPoll);
     const [selectedOption, setSelectedOption] = useState(null);
     const [hasVoted, setHasVoted] = useState(false);
     const [isVoting, setIsVoting] = useState(false);
-    const [pollId, setPollId] = useState(null);
+    const [pollId, setPollId] = useState(data?.id || data?.documentId || null);
 
     useEffect(() => {
         if (isLoading) {
@@ -53,19 +63,20 @@ const PollWidget = ({ data = null, isLoading = false }) => {
             setPollId(null);
         } else if (data) {
             const p = data.attributes || data;
-            setPollId(data.documentId || data.id || null);
+            const currentPollId = data.documentId || data.id || null;
+            setPollId(currentPollId);
             setPollData({
                 question: p.question,
                 options: p.options || []
             });
             
             // Check if user already voted for this poll
-            if (data.id && typeof window !== 'undefined') {
-                const voted = localStorage.getItem(`voted_poll_${data.id}`);
+            if (currentPollId && typeof window !== 'undefined') {
+                const voted = localStorage.getItem(`voted_poll_${currentPollId}`);
                 if (voted) setHasVoted(true);
             }
         }
-    }, [data, isLoading, locale]);
+    }, [data, isLoading, locale, t.dummyQuestion, t.dummyOptions]);
 
     const handleVote = async (e) => {
         e.preventDefault();

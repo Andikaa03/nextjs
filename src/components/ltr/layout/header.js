@@ -523,14 +523,8 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                                 <ul className="align-items-center d-flex gap-2">
                                                     {headerTopData.socialLinks.map((item, i) => (
                                                     <li key={i}>
-                                                        <Link href={item.url} target="_blank" className="d-flex align-items-center justify-content-center">
-                                                            {item.icon && (
-                                                                <img 
-                                                                    src={getStrapiMedia(item.icon)} 
-                                                                    alt="Social link" 
-                                                                    style={{ width: '16px', height: '16px', objectFit: 'contain' }}
-                                                                />
-                                                            )}
+                                                        <Link href={item.url || '#'} target="_blank">
+                                                            <i className={`fab fa-${item.icon}`} />
                                                         </Link>
                                                     </li>
                                                     ))}
@@ -541,14 +535,9 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                         )}
                                         {headerTopData?.leftMenu?.map((item, i) => (
                                         <li className="d-none d-sm-block" key={i}>
-                                            <Link href={item.url || "#"} className="d-flex align-items-center">
+                                            <Link href={item.url || "#"}>
                                                 {item.icon && (
-                                                    <img 
-                                                        src={getStrapiMedia(item.icon)} 
-                                                        alt={item.label} 
-                                                        style={{ width: '16px', height: '16px', objectFit: 'contain' }}
-                                                        className="me-1" 
-                                                    />
+                                                    <i className={`fa fa-${item.icon}`} title={item.label}></i>
                                                 )}
                                                 <span>{item.label}</span>
                                             </Link>
@@ -579,14 +568,9 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                     <ul className="d-flex justify-content-end">
                                         {headerTopData.rightMenu.map((item, i) => (
                                         <li key={i}>
-                                            <Link href={item.url || "#"} className="d-flex align-items-center">
+                                            <Link href={item.url || "#"}>
                                                 {item.icon && (
-                                                    <img 
-                                                        src={getStrapiMedia(item.icon)} 
-                                                        alt={item.label} 
-                                                        style={{ width: '16px', height: '16px', objectFit: 'contain' }}
-                                                        className="me-1" 
-                                                    />
+                                                    <i className={`fa fa-${item.icon}`} title={item.label}></i>
                                                 )}
                                                 <span>{item.label}</span>
                                             </Link>
@@ -710,13 +694,18 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                         </div>
                     </div>
                     <div className="container position-relative">
-                        <Link className="navbar-brand d-md-none" href="/">
-                            <img 
-                                src={headerLogo || "/assets/images/logo.png"} 
-                                alt="Logo" 
-                                style={{ width: '150px', height: '40px', objectFit: 'contain' }}
-                            />
-                        </Link>
+                        <div className="d-md-none flex-grow-1 ps-2">
+                            <Link className="navbar-brand d-block mb-1" href="/">
+                                <img 
+                                    src={headerLogo || "/assets/images/logo.png"} 
+                                    alt="Logo" 
+                                    style={{ width: '150px', height: '40px', objectFit: 'contain' }}
+                                />
+                            </Link>
+                            <div className={`date-text-mobile fw-medium ${locale === 'bn' ? 'date-text-bn' : ''}`}>
+                                {currentDate}
+                            </div>
+                        </div>
                         <button type="button" className="btn btn-search_two  ms-auto ms-md-0 d-lg-none" onClick={handleSearchButtonClick}><i className="fa fa-search" /></button>
                           
                         <div className="d-lg-none ms-2"><ThemeChanger /></div>

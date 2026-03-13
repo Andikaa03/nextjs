@@ -767,6 +767,24 @@ article:hover figure a:before,
 }
 
 @media (max-width: 991px) {
+    .header-top {
+        display: flex;
+        align-items: center;
+        padding: 5px 0 !important;
+        min-height: 48px;
+    }
+    
+    /* Adjust alignment for header social */
+    .top-left-menu .header-social ul {
+        justify-content: flex-start !important;
+    }
+
+    /* Adjust right menu alignment */
+    .header-right-menu ul {
+        justify-content: flex-end !important;
+    }
+}
+@media (max-width: 991px) {
     header {
         -webkit-box-shadow: 0 1px 5px rgba(0, 0, 0, .25);
         box-shadow: 0 1px 5px rgba(0, 0, 0, .25);
@@ -774,6 +792,29 @@ article:hover figure a:before,
 
     .custom-navbar {
         border: 0;
+        height: 105px !important;
+        min-height: 105px !important;
+        max-height: 105px !important;
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+        display: flex;
+        align-items: center;
+    }
+    
+    .date-text-mobile {
+        color: #111;
+        line-height: 1.4;
+        font-size: 13px; /* Smaller, standard font for English */
+    }
+
+    .date-text-mobile.date-text-bn {
+        font-size: 16px; /* Thicker, slightly larger font for Bangla legibility */
+    }
+    
+    .custom-navbar > .container {
+        height: 100%;
+        display: flex;
+        align-items: center;
     }
 }
 
@@ -8633,16 +8674,30 @@ h3.latest-video-title {
 }
 
 @media (max-width: 767px) {
-    .latest-video-title {
-        font-size: 34px !important;
+    h3.latest-video-title {
+        font-size: 32px !important;
+        margin-bottom: 8px !important;
     }
 
     .latest-video-desc {
         font-size: 22px !important;
     }
 
-    .rightSidebar .add-inner img {
+    .add-inner {
         width: 100% !important;
+        display: block !important;
+    }
+
+    .add-inner a {
+        display: block;
+        width: 100%;
+    }
+
+    .add-inner img {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        object-fit: cover !important;
     }
 
     .articles-wrapper .add-inner.mb-0 {

@@ -615,61 +615,63 @@ export default function Home() {
             {/* START SIDE CONTENT */}
             <div className={`col-sm-5 col-md-4 col-xl-3 rightSidebar ${locale === 'bn' ? 'rightSidebar-locale-bn' : 'rightSidebar-locale-en'}`}>
               <StickyBox>
-                {/* START SOCIAL COUNTER TEXT */}
-                <div className="align-items-center d-flex fs-6 justify-content-center mb-1 text-center social-counter-total">
-                  <i className="fa-solid fa-heart text-primary me-1" /> {t.socialJoin}{" "}
-                  <span className="fw-bold mx-1">{globalSettings?.socialTotalFollowers || '0'}</span> {t.socialFollowers}
+                <div className="d-none d-md-block">
+                  {/* START SOCIAL COUNTER TEXT */}
+                  <div className="align-items-center d-flex fs-6 justify-content-center mb-1 text-center social-counter-total">
+                    <i className="fa-solid fa-heart text-primary me-1" /> {t.socialJoin}{" "}
+                    <span className="fw-bold mx-1">{globalSettings?.socialTotalFollowers || '0'}</span> {t.socialFollowers}
+                  </div>
+                  {/* END OF /. SOCIAL COUNTER TEXT */}
+                  {/* START SOCIAL ICON */}
+                  <div className="social-media-inner">
+                    <ul className="g-1 row social-media">
+                      <li className="col-4">
+                        <a href={globalSettings?.socialRssUrl || '#'} className="rss" target="_blank">
+                          <i className="fas fa-rss" />
+                          <div>{globalSettings?.socialRssSubscribers || 0}</div>
+                          <p className="follower-label-text">{t.socialSubscribers}</p>
+                        </a>
+                      </li>
+                      <li className="col-4">
+                        <a href={globalSettings?.socialFacebookUrl || '#'} className="fb" target="_blank">
+                          <i className="fab fa-facebook-f" />
+                          <div>{globalSettings?.socialFacebookFans || 0}</div>
+                          <p className="follower-label-text">{t.socialFans}</p>
+                        </a>
+                      </li>
+                      <li className="col-4">
+                        <a href={globalSettings?.socialInstagramUrl || '#'} className="insta" target="_blank">
+                          <i className="fab fa-instagram" />
+                          <div>{globalSettings?.socialInstagramFollowers || 0}</div>
+                          <p className="follower-label-text">{t.socialFollowers}</p>
+                        </a>
+                      </li>
+                      <li className="col-4">
+                        <a href={globalSettings?.socialYoutubeUrl || '#'} className="you_tube" target="_blank">
+                          <i className="fab fa-youtube" />
+                          <div>{globalSettings?.socialYoutubeSubscribers || 0}</div>
+                          <p className="follower-label-text">{t.socialSubscribers}</p>
+                        </a>
+                      </li>
+                      <li className="col-4">
+                        <a href={globalSettings?.socialTwitterUrl || '#'} className="twitter" target="_blank">
+                          <i className="fab fa-twitter" />
+                          <div>{globalSettings?.socialTwitterFollowers || 0}</div>
+                          <p className="follower-label-text">{t.socialFollowers}</p>
+                        </a>
+                      </li>
+                      <li className="col-4">
+                        <a href={globalSettings?.socialPinterestUrl || '#'} className="pint" target="_blank">
+                          <i className="fab fa-pinterest-p" />
+                          <div>{globalSettings?.socialPinterestFollowers || 0}</div>
+                          <p className="follower-label-text">{t.socialFollowers}</p>
+                        </a>
+                      </li>
+                    </ul>{" "}
+                    {/* /.social icon */}
+                  </div>
+                  {/* END OF /. SOCIAL ICON */}
                 </div>
-                {/* END OF /. SOCIAL COUNTER TEXT */}
-                {/* START SOCIAL ICON */}
-                <div className="social-media-inner">
-                  <ul className="g-1 row social-media">
-                    <li className="col-4">
-                      <a href={globalSettings?.socialRssUrl || '#'} className="rss" target="_blank">
-                        <i className="fas fa-rss" />
-                        <div>{globalSettings?.socialRssSubscribers || 0}</div>
-                        <p className="follower-label-text">{t.socialSubscribers}</p>
-                      </a>
-                    </li>
-                    <li className="col-4">
-                      <a href={globalSettings?.socialFacebookUrl || '#'} className="fb" target="_blank">
-                        <i className="fab fa-facebook-f" />
-                        <div>{globalSettings?.socialFacebookFans || 0}</div>
-                        <p className="follower-label-text">{t.socialFans}</p>
-                      </a>
-                    </li>
-                    <li className="col-4">
-                      <a href={globalSettings?.socialInstagramUrl || '#'} className="insta" target="_blank">
-                        <i className="fab fa-instagram" />
-                        <div>{globalSettings?.socialInstagramFollowers || 0}</div>
-                        <p className="follower-label-text">{t.socialFollowers}</p>
-                      </a>
-                    </li>
-                    <li className="col-4">
-                      <a href={globalSettings?.socialYoutubeUrl || '#'} className="you_tube" target="_blank">
-                        <i className="fab fa-youtube" />
-                        <div>{globalSettings?.socialYoutubeSubscribers || 0}</div>
-                        <p className="follower-label-text">{t.socialSubscribers}</p>
-                      </a>
-                    </li>
-                    <li className="col-4">
-                      <a href={globalSettings?.socialTwitterUrl || '#'} className="twitter" target="_blank">
-                        <i className="fab fa-twitter" />
-                        <div>{globalSettings?.socialTwitterFollowers || 0}</div>
-                        <p className="follower-label-text">{t.socialFollowers}</p>
-                      </a>
-                    </li>
-                    <li className="col-4">
-                      <a href={globalSettings?.socialPinterestUrl || '#'} className="pint" target="_blank">
-                        <i className="fab fa-pinterest-p" />
-                        <div>{globalSettings?.socialPinterestFollowers || 0}</div>
-                        <p className="follower-label-text">{t.socialFollowers}</p>
-                      </a>
-                    </li>
-                  </ul>{" "}
-                  {/* /.social icon */}
-                </div>
-                {/* END OF /. SOCIAL ICON */}
                 {/* START TRENDING TOPICS */}
                 <div className="panel_inner review-inner">
                   <div className="panel_header">
@@ -1130,6 +1132,66 @@ export default function Home() {
                     <DatePickerComponents />
                   </div>
                   {/* END OF /. ARCHIVE */}
+
+                  {/* START MOBILE-ONLY SOCIAL WIDGET (BELOW CALENDAR) */}
+                  <div className="d-block d-md-none mt-3 mb-4">
+                    {/* START SOCIAL COUNTER TEXT */}
+                    <div className="align-items-center d-flex fs-6 justify-content-center mb-1 text-center social-counter-total">
+                      <i className="fa-solid fa-heart text-primary me-1" /> {t.socialJoin}{" "}
+                      <span className="fw-bold mx-1">{globalSettings?.socialTotalFollowers || '0'}</span> {t.socialFollowers}
+                    </div>
+                    {/* END OF /. SOCIAL COUNTER TEXT */}
+                    {/* START SOCIAL ICON */}
+                    <div className="social-media-inner">
+                      <ul className="g-1 row social-media">
+                        <li className="col-4">
+                          <a href={globalSettings?.socialRssUrl || '#'} className="rss" target="_blank">
+                            <i className="fas fa-rss" />
+                            <div>{globalSettings?.socialRssSubscribers || 0}</div>
+                            <p className="follower-label-text">{t.socialSubscribers}</p>
+                          </a>
+                        </li>
+                        <li className="col-4">
+                          <a href={globalSettings?.socialFacebookUrl || '#'} className="fb" target="_blank">
+                            <i className="fab fa-facebook-f" />
+                            <div>{globalSettings?.socialFacebookFans || 0}</div>
+                            <p className="follower-label-text">{t.socialFans}</p>
+                          </a>
+                        </li>
+                        <li className="col-4">
+                          <a href={globalSettings?.socialInstagramUrl || '#'} className="insta" target="_blank">
+                            <i className="fab fa-instagram" />
+                            <div>{globalSettings?.socialInstagramFollowers || 0}</div>
+                            <p className="follower-label-text">{t.socialFollowers}</p>
+                          </a>
+                        </li>
+                        <li className="col-4">
+                          <a href={globalSettings?.socialYoutubeUrl || '#'} className="you_tube" target="_blank">
+                            <i className="fab fa-youtube" />
+                            <div>{globalSettings?.socialYoutubeSubscribers || 0}</div>
+                            <p className="follower-label-text">{t.socialSubscribers}</p>
+                          </a>
+                        </li>
+                        <li className="col-4">
+                          <a href={globalSettings?.socialTwitterUrl || '#'} className="twitter" target="_blank">
+                            <i className="fab fa-twitter" />
+                            <div>{globalSettings?.socialTwitterFollowers || 0}</div>
+                            <p className="follower-label-text">{t.socialFollowers}</p>
+                          </a>
+                        </li>
+                        <li className="col-4">
+                          <a href={globalSettings?.socialPinterestUrl || '#'} className="pint" target="_blank">
+                            <i className="fab fa-pinterest-p" />
+                            <div>{globalSettings?.socialPinterestFollowers || 0}</div>
+                            <p className="follower-label-text">{t.socialFollowers}</p>
+                          </a>
+                        </li>
+                      </ul>{" "}
+                      {/* /.social icon */}
+                    </div>
+                    {/* END OF /. SOCIAL ICON */}
+                  </div>
+                  {/* END OF /. MOBILE-ONLY SOCIAL WIDGET */}
                   {/* START POLL WIDGET */}
                   <PollWidget data={pollData} isLoading={false} />
                   {/* END OF /. POLL WIDGET */}

@@ -36,7 +36,10 @@ export async function getActivePoll(locale = 'bn') {
   });
 
   try {
-    const data = await fetchAPI(`/polls?${queryParams}`);
+    const data = await fetchAPI(`/polls?${queryParams}`, {
+      cache: 'no-store',
+      next: { revalidate: 0 }
+    });
     return data;
   } catch {
     return { data: [] };

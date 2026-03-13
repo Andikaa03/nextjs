@@ -108,7 +108,7 @@ export async function getAdsManagement() {
 export async function getHeaderTop(locale = 'bn') {
   const strapiLocale = getStrapiLocale(locale);
   try {
-    return await fetchAPI(`/header-top?populate[socialLinks][populate]=icon&populate[leftMenu][populate]=icon&populate[rightMenu][populate]=icon&locale=${strapiLocale}`, { silent: true });
+    return await fetchAPI(`/header-top?populate=*&locale=${strapiLocale}`, { silent: true });
   } catch {
     return { data: null };
   }
