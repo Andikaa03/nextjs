@@ -3154,6 +3154,15 @@ div.bhoechie-tab .weather-temp-wrap:not(.active) {
     font-size: 22px !important;
 }
 
+@media (max-width: 767px) {
+    .locale-bn .comment-form h3 {
+        font-size: 24px !important;
+    }
+    .locale-bn .comment-form label {
+        font-size: 18px !important;
+    }
+}
+
 @media(min-width:768px) and (max-width:1199px) {
     .social-media li a {
         padding: 15px 5px;
@@ -8139,6 +8148,7 @@ body.layout-rtl .style-settings-content ul li select {
 
     .locale-bn .recent-reviews-panel .more-post h4 {
         font-size: 26px !important;
+        line-height: 1.2 !important;
         margin-top: 8px !important;
     }
 
