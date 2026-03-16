@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import ScrollToTopUI from '../scroll-to-top/scroll-to-top';
 import { useBackgroundImageLoader } from '../use-background-image/use-background-image';
-import { getRecentPostArticles } from '@/services/articleService';
+import { getRecentPostArticles, getLatestArticles } from '@/services/articleService';
 import { getTags, getMenuItems, getGlobalSettings } from '@/services/globalService';
 import { subscribeNewsletter } from '@/services/newsletterService';
 import { getStrapiMedia, formatDate, toBengaliNumber, getStrapiLocale } from '@/lib/strapi';

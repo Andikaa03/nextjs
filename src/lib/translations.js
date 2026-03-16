@@ -66,8 +66,27 @@ export const translations = {
     video: 'ভিডিও',
     pages: 'পেজ',
     aboutUs: 'আমাদের সম্পর্কে',
-    typography: 'টাইপোগ্রাফি',
+    typography: ' টাইপোগ্রাফি',
     faq: 'FAQ',
+    
+    // ePaper
+    goToPage: 'পাতায় যান',
+    fontInc: 'ফন্ট বাড়ান',
+    fontDec: 'ফন্ট কমান',
+    zoomIn: 'জুম ইন',
+    zoomOut: 'জুম আউট',
+    downloadImage: 'ছবি ডাউনলোড',
+    imageView: 'ইমেজ ভিউ',
+    textView: 'টেক্সট ভিউ',
+    save: 'সংরক্ষণ',
+    saved: 'সংরক্ষিত',
+    noImageAvailable: 'কোন ছবি পাওয়া যায়নি',
+    loading: 'লোড হচ্ছে...',
+    articleNotFound: 'নিবন্ধটি পাওয়া যায়নি',
+    backToePaper: 'ই-পেপারে ফিরে যান',
+    noEpaperFound: 'ই-পেপার পাওয়া যায়নি',
+    uploadEpaperInstruction: 'অনুগ্রহ করে স্ট্রাপি অ্যাডমিন থেকে খবরের কাগজ আপলোড করুন',
+    pageLabel: 'পাতা',
   },
   
   en: {
@@ -136,6 +155,25 @@ export const translations = {
     aboutUs: 'About Us',
     typography: 'Typography',
     faq: 'FAQ',
+
+    // ePaper
+    goToPage: 'Go to page',
+    fontInc: 'font-inc',
+    fontDec: 'font-dec',
+    zoomIn: 'Zoom In',
+    zoomOut: 'Zoom Out',
+    downloadImage: 'Dload Image',
+    imageView: 'Image View',
+    textView: 'Text View',
+    save: 'Save',
+    saved: 'Saved',
+    noImageAvailable: 'No Image Available',
+    loading: 'Loading...',
+    articleNotFound: 'Article Not Found',
+    backToePaper: 'Back to ePaper',
+    noEpaperFound: 'No ePaper found',
+    uploadEpaperInstruction: 'Please upload newspaper pages from the Strapi admin.',
+    pageLabel: 'Page',
   }
 };
 
