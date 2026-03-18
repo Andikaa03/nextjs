@@ -31,31 +31,53 @@ export async function getCategoryBySlug(slug, locale = 'bn') {
 export async function getCategoriesWithChildren(locale = 'bn') {
   const strapiLocale = getStrapiLocale(locale);
   try {
+    // Populate parentCategory to identify relationships
     const res = await fetchAPI(
       `/categories?populate=parentCategory&locale=${strapiLocale}&sort=sortOrder:asc,name:asc&pagination[pageSize]=100`
     );
-    const allCategories = (res?.data || []).map(c => c.attributes || c);
+    const allCategories = (res?.data || []).map(c => ({
+      id: c.id,
+      ...(c.attributes || c)
+    }));
 
-    // Identify root categories: no parentCategory and showInMenu === true
-    const roots = allCategories.filter(cat => {
+    // Logic for parent-child hierarchy as requested:
+    // 1. A category is a "Parent" (heading) if:
+    //    - It has no parent (Root)
+    //    - OR it has children
+    
+    // First, map which categories have children
+    const parentIdsWithChildren = new Set();
+    allCategories.forEach(cat => {
+      const parentId = cat.parentCategory?.id || cat.parentCategory?.data?.id;
+      if (parentId) {
+        parentIdsWithChildren.add(parentId);
+      }
+    });
+
+    // Identify headings: No parent OR has children, AND showInMenu must be true
+    const headings = allCategories.filter(cat => {
       if (cat.showInMenu !== true) return false;
       const parentId = cat.parentCategory?.id || cat.parentCategory?.data?.id;
+      
+      // If no parent, it's a heading
       if (!parentId) return true;
-      if (parentId === cat.id) return true; // Fix circular references
+      
+      // If it has children, it's also a heading (even if it has a parent)
+      if (parentIdsWithChildren.has(cat.id)) return true;
+      
       return false;
     });
 
-    const rootIds = new Set(roots.map(r => r.id));
-
-    // Build children manually: categories whose parentCategory points to a root
-    return roots.map(root => {
+    // For each heading, find its children
+    return headings.map(parent => {
       const children = allCategories
         .filter(cat => {
           const parentId = cat.parentCategory?.id || cat.parentCategory?.data?.id;
-          return parentId === root.id && cat.id !== root.id && !rootIds.has(cat.id);
+          return parentId === parent.id && cat.id !== parent.id;
         })
         .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
-      return { ...root, children };
+      
+      return { ...parent, children };
     });
   } catch (error) {
     console.error('Error fetching categories with children:', error);
