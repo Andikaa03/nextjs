@@ -682,7 +682,9 @@ export default function Home() {
                   </div>
                   <div className="panel_body">
                     {(() => {
-                      const sourceCategories = sidebarCategories.length > 0 ? sidebarCategories : (trendingCategories.length > 0 ? trendingCategories : (categories.length > 0 ? categories : (loading ? Array(5).fill(null) : [])));
+                      const sourceCategories = trendingCategories.length > 0
+                        ? trendingCategories
+                        : (loading ? Array(5).fill(null) : []);
                       const displayCategories = showAllCategories ? sourceCategories : sourceCategories.slice(0, 5);
                       
                       return (
