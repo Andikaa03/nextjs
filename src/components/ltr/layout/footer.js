@@ -343,7 +343,7 @@ const Footer = ({ hideMiddleHeader = false }) => {
           <div className="row">
             {/* START FOOTER BOX (Qr Code) */}
             {!hideMiddleHeader && (
-              <div className="col-sm-6 col-lg-3 footer-box py-4">
+              <div className="col-sm-6 col-lg-3 footer-box py-4 footer-hide-mobile">
                 <div className="about-inner text-center">
                   <h5 className="wiget-title">{t.app.title}</h5>
                   <div className="bg-white pb-0 mb-3 d-inline-block rounded">
@@ -366,7 +366,7 @@ const Footer = ({ hideMiddleHeader = false }) => {
             {/*  END OF /. FOOTER BOX (Qr Code) */}
             
             {/* START FOOTER BOX (Social Contact - Dynamic) */}
-            <div className={hideMiddleHeader ? "col-sm-6 col-lg-4 footer-box py-4" : "col-sm-6 col-lg-3 footer-box py-4"}>
+            <div className={hideMiddleHeader ? "col-sm-6 col-lg-4 footer-box py-4 footer-social-box" : "col-sm-6 col-lg-3 footer-box py-4 footer-social-box"}>
                <h5 className="wiget-title">{footerAttrs?.socialTitle || t.social}</h5>
                 <ul className="list-unstyled m-0 menu-services">
                     {footerAttrs?.socialLinks && footerAttrs.socialLinks.length > 0 ? (
@@ -388,7 +388,7 @@ const Footer = ({ hideMiddleHeader = false }) => {
                 </ul>
 
                 {/* Editorial Office Info */}
-                <div className="mt-5 text-white" style={{ fontSize: '14px', lineHeight: '1.6' }}>
+                <div className="mt-5 text-white footer-editorial" style={{ fontSize: '14px', lineHeight: '1.6' }}>
                   <h5 className="wiget-title mb-1">{footerAttrs?.editorialName || t.editorial.title}</h5>
                   <p className="mb-0">{footerAttrs?.editorialOffice || t.editorial.office}</p>
                   <p className="mb-0">{footerAttrs?.editorialAddress1 || t.editorial.address1}</p>
@@ -402,7 +402,7 @@ const Footer = ({ hideMiddleHeader = false }) => {
             {/* END OF /. FOOTER BOX (Social Contact) */}
 
             {/* START FOOTER BOX (Category) */}
-            <div className={hideMiddleHeader ? "col-sm-6 col-lg-4 footer-box py-4" : "col-sm-6 col-lg-3 footer-box py-4"}>
+            <div className={hideMiddleHeader ? "col-sm-6 col-lg-4 footer-box py-4 footer-hide-mobile" : "col-sm-6 col-lg-3 footer-box py-4 footer-hide-mobile"}>
               <h5 className="wiget-title">{footerAttrs?.categoryTitle || t.category}</h5>
               <div className="row">
                 <div className="col-6">
@@ -432,7 +432,7 @@ const Footer = ({ hideMiddleHeader = false }) => {
             {/* END OF /. FOOTER BOX (Category) */}
 
             {/* START FOOTER BOX (Recent Post) */}
-            <div className={hideMiddleHeader ? "col-sm-6 col-lg-4 footer-box py-4" : "col-sm-6 col-lg-3 footer-box py-4"}>
+            <div className={hideMiddleHeader ? "col-sm-6 col-lg-4 footer-box py-4 footer-hide-mobile" : "col-sm-6 col-lg-3 footer-box py-4 footer-hide-mobile"}>
               <h5 className="wiget-title">{t.recentPost}</h5>
               <div className="footer-news-grid">
                 {recentPosts.map((post, i) => {

@@ -10,7 +10,7 @@ import HomeFeatureCarousal from "@/components/ltr/home-feature-carousal/home-fea
 import HomeCenterSlider from "@/components/ltr/home-center-slider/home-center-slider";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getTopNewsArticles, getHeadlineArticles, getTopSliderArticles, getMiddleSliderArticles, getMostReadArticles, getPopularNewsArticles, getTechInnovationArticles, getEditorChoiceArticles, getRecentPostArticles, getRecentReviewArticles, getLatestArticles, getArticlesByCategory } from "@/services/articleService";
+import { getTopNewsArticles, getHeadlineArticles, getTopSliderArticles, getMiddleSliderArticles, getMostReadArticles, getPopularNewsArticles, getTechInnovationArticles, getEditorChoiceArticles, getRecentPostArticles, getRecentReviewArticles, getLatestArticles } from "@/services/articleService";
 import { getYoutubeVideos, getActivePoll } from "@/services/mediaService";
 import { getGlobalSettings, getTags, getCategories, getTrendingCategories, getSidebarCategories, getAdsManagement } from "@/services/globalService";
 import { getWeatherForecast } from "@/services/weatherService";
@@ -23,7 +23,6 @@ const DatePickerComponents = dynamic(() => import("@/components/ltr/date-picker/
 const PollWidget = dynamic(() => import("@/components/ltr/poll-widget/poll"), { ssr: false });
 const Tags = dynamic(() => import("@/components/ltr/tags/tags"), { ssr: false });
 
-// Helper: get article data (supports both v4 and v5)
 // Helper: get article data (supports both v4 and v5)
 const getArt = (article, locale = 'bn') => {
   const t = dictionary[locale] || dictionary.bn;
@@ -54,10 +53,7 @@ const fmtWeatherValue = (value, locale = 'bn') => {
   return locale === 'bn' ? toBengaliNumber(rounded) : rounded;
 };
 
-// ... (rest of page component)
 import { useLanguage } from '@/lib/LanguageContext';
-
-// ... (rest of imports)
 
 const dictionary = {
   en: {
@@ -92,7 +88,6 @@ const dictionary = {
   bn: {
     loading: 'লোড হচ্ছে...',
     topNews: 'শীর্ষ সংবাদ',
-    topNews: 'শীর্ষ সংবাদ',
     mostRead: 'সর্বাধিক পঠিত',
     popularNews: 'জনপ্রিয় সংবাদ',
     by: 'লিখেছেন:',
@@ -125,7 +120,6 @@ export default function Home() {
   const { locale } = useLanguage();
   const t = dictionary[locale] || dictionary.bn;
   
-  // Dummy data for loading state
   // Dummy data for loading state
   const dummyArticles = Array(12).fill({
     title: 'সত্যধারা প্রতিদিনে সর্বশেষ আপডেট দেখুন',
@@ -182,6 +176,26 @@ export default function Home() {
   const shareText = locale === 'bn' ? 'সাম্প্রতিক নিবন্ধ দেখুন' : 'Check out recent articles';
   const encodedShareUrl = encodeURIComponent(shareBaseUrl);
   const encodedShareText = encodeURIComponent(shareText);
+
+  const toCount = (value) => {
+    if (value === null || value === undefined) return 0;
+    if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+    const normalized = String(value).replace(/,/g, '').trim();
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
+  const socialCounts = {
+    rss: toCount(globalSettings?.socialRssSubscribers),
+    facebook: toCount(globalSettings?.socialFacebookFans),
+    instagram: toCount(globalSettings?.socialInstagramFollowers),
+    youtube: toCount(globalSettings?.socialYoutubeSubscribers),
+    twitter: toCount(globalSettings?.socialTwitterFollowers),
+    pinterest: toCount(globalSettings?.socialPinterestFollowers),
+  };
+
+  const calculatedSocialTotal = socialCounts.rss + socialCounts.facebook + socialCounts.instagram + socialCounts.youtube + socialCounts.twitter + socialCounts.pinterest;
+  const socialTotalFollowers = calculatedSocialTotal > 0 ? calculatedSocialTotal : toCount(globalSettings?.socialTotalFollowers);
 
   const openPopup = (url) => {
     if (typeof window === 'undefined') return;
@@ -352,10 +366,9 @@ export default function Home() {
     fetchData();
   }, [locale]);
 
-  {/* *** ADD AND REMOVE CLASS ON BODY TAG *** */ }
   useRemoveBodyClass(['home-nine'], ['home-six', 'home-seven', 'boxed-layout', 'layout-rtl']);
-  {/* *** IMPORT BACKGROUND IMAGE *** */ }
-  useBackgroundImageLoader()
+  useBackgroundImageLoader();
+
   return (
     <Layout globalSettings={globalSettings}>
       {/* *** START PAGE MAIN CONTENT *** */}
@@ -424,12 +437,12 @@ export default function Home() {
                   })()}
                 </div>
               </div>
-              <div className="col-md-6 col-xxl-4 thm-padding">
+              <div className="col-12 col-md-6 col-xxl-4 thm-padding">
                 <div className="slider-wrapper">
                   <HomeCenterSlider data={displayPopular} isLoading={false} />
                 </div>
               </div>
-              <div className="col-md-6 col-xxl-4 thm-padding">
+              <div className="col-12 col-md-6 col-xxl-4 thm-padding">
                 <div className="row slider-right-post thm-margin">
                   {(displayLatest.length > 0 ? displayLatest.slice(0, 3) : []).map((article, i) => {
                     const a = getArt(article, locale);
@@ -622,7 +635,7 @@ export default function Home() {
                   {/* START SOCIAL COUNTER TEXT */}
                   <div className="align-items-center d-flex fs-6 justify-content-center mb-1 text-center social-counter-total">
                     <i className="fa-solid fa-heart text-primary me-1" /> {t.socialJoin}{" "}
-                    <span className="fw-bold mx-1">{globalSettings?.socialTotalFollowers || '0'}</span> {t.socialFollowers}
+                    <span className="fw-bold mx-1">{socialTotalFollowers}</span> {t.socialFollowers}
                   </div>
                   {/* END OF /. SOCIAL COUNTER TEXT */}
                   {/* START SOCIAL ICON */}
@@ -631,42 +644,42 @@ export default function Home() {
                       <li className="col-4">
                         <a href={globalSettings?.socialRssUrl || '#'} className="rss" target="_blank">
                           <i className="fas fa-rss" />
-                          <div>{globalSettings?.socialRssSubscribers || 0}</div>
+                          <div>{socialCounts.rss}</div>
                           <p className="follower-label-text">{t.socialSubscribers}</p>
                         </a>
                       </li>
                       <li className="col-4">
                         <a href={globalSettings?.socialFacebookUrl || '#'} className="fb" target="_blank">
                           <i className="fab fa-facebook-f" />
-                          <div>{globalSettings?.socialFacebookFans || 0}</div>
+                          <div>{socialCounts.facebook}</div>
                           <p className="follower-label-text">{t.socialFans}</p>
                         </a>
                       </li>
                       <li className="col-4">
                         <a href={globalSettings?.socialInstagramUrl || '#'} className="insta" target="_blank">
                           <i className="fab fa-instagram" />
-                          <div>{globalSettings?.socialInstagramFollowers || 0}</div>
+                          <div>{socialCounts.instagram}</div>
                           <p className="follower-label-text">{t.socialFollowers}</p>
                         </a>
                       </li>
                       <li className="col-4">
                         <a href={globalSettings?.socialYoutubeUrl || '#'} className="you_tube" target="_blank">
                           <i className="fab fa-youtube" />
-                          <div>{globalSettings?.socialYoutubeSubscribers || 0}</div>
+                          <div>{socialCounts.youtube}</div>
                           <p className="follower-label-text">{t.socialSubscribers}</p>
                         </a>
                       </li>
                       <li className="col-4">
                         <a href={globalSettings?.socialTwitterUrl || '#'} className="twitter" target="_blank">
                           <i className="fab fa-twitter" />
-                          <div>{globalSettings?.socialTwitterFollowers || 0}</div>
+                          <div>{socialCounts.twitter}</div>
                           <p className="follower-label-text">{t.socialFollowers}</p>
                         </a>
                       </li>
                       <li className="col-4">
                         <a href={globalSettings?.socialPinterestUrl || '#'} className="pint" target="_blank">
                           <i className="fab fa-pinterest-p" />
-                          <div>{globalSettings?.socialPinterestFollowers || 0}</div>
+                          <div>{socialCounts.pinterest}</div>
                           <p className="follower-label-text">{t.socialFollowers}</p>
                         </a>
                       </li>
@@ -1037,14 +1050,21 @@ export default function Home() {
                                 </div>
                               </li>
                               <li>
-                                <a href="#" onClick={handleLikeClick} aria-label={locale === 'bn' ? 'লাইক' : 'Like'}>
-                                  <i className={`ti ti-heart ${isRecentFooterLiked ? 'text-primary' : ''}`} />
+                                <a
+                                  href="#"
+                                  onClick={handleLikeClick}
+                                  className={`love-react-link ${isRecentFooterLiked ? 'is-active' : ''}`}
+                                  aria-label={locale === 'bn' ? 'লাইক' : 'Like'}
+                                  aria-pressed={isRecentFooterLiked}
+                                >
+                                  <i className={`ti ti-heart love-react-icon ${isRecentFooterLiked ? 'is-active' : ''}`} />
                                 </a>
                               </li>
                               <li>
                                 <a
                                   href={`https://twitter.com/intent/tweet?url=${encodedShareUrl}&text=${encodedShareText}`}
                                   onClick={handleTwitterClick}
+                                  className="footer-twitter-btn"
                                   aria-label={locale === 'bn' ? 'টুইটারে শেয়ার করুন' : 'Share on X'}
                                 >
                                   <i className="ti ti-twitter" />
@@ -1143,7 +1163,7 @@ export default function Home() {
                     {/* START SOCIAL COUNTER TEXT */}
                     <div className="align-items-center d-flex fs-6 justify-content-center mb-1 text-center social-counter-total">
                       <i className="fa-solid fa-heart text-primary me-1" /> {t.socialJoin}{" "}
-                      <span className="fw-bold mx-1">{globalSettings?.socialTotalFollowers || '0'}</span> {t.socialFollowers}
+                      <span className="fw-bold mx-1">{socialTotalFollowers}</span> {t.socialFollowers}
                     </div>
                     {/* END OF /. SOCIAL COUNTER TEXT */}
                     {/* START SOCIAL ICON */}
@@ -1152,42 +1172,42 @@ export default function Home() {
                         <li className="col-4">
                           <a href={globalSettings?.socialRssUrl || '#'} className="rss" target="_blank">
                             <i className="fas fa-rss" />
-                            <div>{globalSettings?.socialRssSubscribers || 0}</div>
+                            <div>{socialCounts.rss}</div>
                             <p className="follower-label-text">{t.socialSubscribers}</p>
                           </a>
                         </li>
                         <li className="col-4">
                           <a href={globalSettings?.socialFacebookUrl || '#'} className="fb" target="_blank">
                             <i className="fab fa-facebook-f" />
-                            <div>{globalSettings?.socialFacebookFans || 0}</div>
+                            <div>{socialCounts.facebook}</div>
                             <p className="follower-label-text">{t.socialFans}</p>
                           </a>
                         </li>
                         <li className="col-4">
                           <a href={globalSettings?.socialInstagramUrl || '#'} className="insta" target="_blank">
                             <i className="fab fa-instagram" />
-                            <div>{globalSettings?.socialInstagramFollowers || 0}</div>
+                            <div>{socialCounts.instagram}</div>
                             <p className="follower-label-text">{t.socialFollowers}</p>
                           </a>
                         </li>
                         <li className="col-4">
                           <a href={globalSettings?.socialYoutubeUrl || '#'} className="you_tube" target="_blank">
                             <i className="fab fa-youtube" />
-                            <div>{globalSettings?.socialYoutubeSubscribers || 0}</div>
+                            <div>{socialCounts.youtube}</div>
                             <p className="follower-label-text">{t.socialSubscribers}</p>
                           </a>
                         </li>
                         <li className="col-4">
                           <a href={globalSettings?.socialTwitterUrl || '#'} className="twitter" target="_blank">
                             <i className="fab fa-twitter" />
-                            <div>{globalSettings?.socialTwitterFollowers || 0}</div>
+                            <div>{socialCounts.twitter}</div>
                             <p className="follower-label-text">{t.socialFollowers}</p>
                           </a>
                         </li>
                         <li className="col-4">
                           <a href={globalSettings?.socialPinterestUrl || '#'} className="pint" target="_blank">
                             <i className="fab fa-pinterest-p" />
-                            <div>{globalSettings?.socialPinterestFollowers || 0}</div>
+                            <div>{socialCounts.pinterest}</div>
                             <p className="follower-label-text">{t.socialFollowers}</p>
                           </a>
                         </li>

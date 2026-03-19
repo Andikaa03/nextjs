@@ -11,7 +11,13 @@ export async function generateMetadata({ params }) {
   const { slug } = params;
   const cookieStore = cookies();
   const locale = cookieStore.get('NEXT_LOCALE')?.value || 'bn';
-  const articleData = await getArticleBySlug(slug, locale);
+  let articleData = null;
+
+  try {
+    articleData = await getArticleBySlug(slug, locale);
+  } catch (error) {
+    console.error('Error generating article metadata:', error);
+  }
   
   if (!articleData) {
     return {

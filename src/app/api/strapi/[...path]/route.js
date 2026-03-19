@@ -21,17 +21,33 @@ async function proxyToStrapi(request, { params }) {
     headers.set('Authorization', `Bearer ${STRAPI_API_TOKEN}`);
   }
 
+  const requestBody = request.method === 'GET' || request.method === 'HEAD'
+    ? undefined
+    : await request.text();
+
   const requestInit = {
     method: request.method,
     headers,
     cache: 'no-store',
   };
 
-  if (!['GET', 'HEAD'].includes(request.method)) {
-    requestInit.body = await request.text();
+  if (requestBody !== undefined) {
+    requestInit.body = requestBody;
   }
 
-  const strapiResponse = await fetch(targetUrl.toString(), requestInit);
+  let strapiResponse = await fetch(targetUrl.toString(), requestInit);
+
+  if (strapiResponse.status === 401 && STRAPI_API_TOKEN) {
+    const retryHeaders = new Headers(headers);
+    retryHeaders.delete('Authorization');
+
+    const retryInit = {
+      ...requestInit,
+      headers: retryHeaders,
+    };
+
+    strapiResponse = await fetch(targetUrl.toString(), retryInit);
+  }
   const responseText = await strapiResponse.text();
   const responseContentType = strapiResponse.headers.get('content-type') || 'application/json';
 

@@ -1,14 +1,136 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import StickyBox from "react-sticky-box";
 import { getStrapiMedia, formatDate, toBengaliNumber } from '@/lib/strapi';
 import { useTranslations } from '@/lib/translations';
 import ImageWithFallback from "@/components/ui/ImageWithFallback";
+import { getLikeCount as fetchLikeCount, incrementLikeCount, decrementLikeCount } from '@/services/shareCountService';
 
 const ArticleSidebar = ({ mostViewed, popularNews, globalSettings: rawGlobalSettings, adsData, locale = 'bn' }) => {
   const { t } = useTranslations(locale);
   const globalSettings = rawGlobalSettings?.attributes || rawGlobalSettings;
+  const [likeCounts, setLikeCounts] = useState({});
+  const [likePending, setLikePending] = useState({});
+  const [likedArticles, setLikedArticles] = useState({});
+
+  const toCount = (value) => {
+    if (value === null || value === undefined) return 0;
+    if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+    const normalized = String(value).replace(/,/g, '').trim();
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
+  const formatCount = (value) => {
+    const safeValue = toCount(value);
+    return locale === 'bn' ? toBengaliNumber(safeValue) : safeValue;
+  };
+
+  const subscriberCount = toCount(
+    globalSettings?.socialYoutubeSubscribers ?? globalSettings?.socialRssSubscribers ?? 0
+  );
+
+  const getLikeFallbackCount = (articleData) => (
+    toCount(articleData?.likes ?? articleData?.likeCount ?? articleData?.viewCount ?? 0)
+  );
+
+  const getArticleId = (item, articleData) => (
+    articleData?.documentId || item?.documentId || articleData?.id || item?.id || null
+  );
+
+  const saveLikedState = (nextState) => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem('sidebarLikedArticles', JSON.stringify(nextState));
+  };
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = window.localStorage.getItem('sidebarLikedArticles');
+      setLikedArticles(raw ? JSON.parse(raw) : {});
+    } catch {
+      setLikedArticles({});
+    }
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchLikes = async () => {
+      const items = (popularNews || []).slice(0, 5);
+
+      const results = await Promise.all(
+        items.map(async (item) => {
+          const data = item.attributes || item;
+          const articleId = getArticleId(item, data);
+          if (!articleId) return null;
+          const likes = await fetchLikeCount(articleId);
+          return [String(articleId), likes];
+        })
+      );
+
+      if (!mounted) return;
+
+      const mapped = {};
+      results.forEach((entry) => {
+        if (!entry) return;
+        mapped[entry[0]] = entry[1];
+      });
+      setLikeCounts(mapped);
+    };
+
+    fetchLikes();
+
+    return () => {
+      mounted = false;
+    };
+  }, [popularNews]);
+
+  const handleLikeClick = async (articleId, fallbackLikeCount) => {
+    if (!articleId || likePending[articleId]) return;
+
+    const key = String(articleId);
+    const base = likeCounts[key] ?? fallbackLikeCount;
+    const currentlyLiked = Boolean(likedArticles[key]);
+
+    const optimisticCount = currentlyLiked
+      ? Math.max(toCount(base) - 1, 0)
+      : toCount(base) + 1;
+
+    const optimisticLiked = {
+      ...likedArticles,
+      [key]: !currentlyLiked,
+    };
+
+    setLikeCounts((prev) => ({
+      ...prev,
+      [key]: optimisticCount,
+    }));
+    setLikedArticles(optimisticLiked);
+    saveLikedState(optimisticLiked);
+    setLikePending((prev) => ({ ...prev, [key]: true }));
+
+    try {
+      const persisted = currentlyLiked
+        ? await decrementLikeCount(articleId)
+        : await incrementLikeCount(articleId);
+
+      if (persisted === null) {
+        return;
+      }
+
+      setLikeCounts((prev) => ({
+        ...prev,
+        [key]: Number.isFinite(persisted) ? persisted : prev[key],
+      }));
+    } catch {
+      return;
+    } finally {
+      setLikePending((prev) => ({ ...prev, [key]: false }));
+    }
+  };
 
   return (
     <StickyBox offsetTop={100} offsetBottom={20}>
@@ -87,6 +209,7 @@ const ArticleSidebar = ({ mostViewed, popularNews, globalSettings: rawGlobalSett
           <li className="nav-item" role="presentation">
             <button
               className="nav-link border-0 active"
+              style={locale === 'bn' ? { fontSize: '1.16rem' } : undefined}
               id="most-viewed"
               data-bs-toggle="tab"
               data-bs-target="#most-viewed-pane"
@@ -101,6 +224,7 @@ const ArticleSidebar = ({ mostViewed, popularNews, globalSettings: rawGlobalSett
           <li className="nav-item" role="presentation">
             <button
               className="nav-link border-0"
+              style={locale === 'bn' ? { fontSize: '1.16rem' } : undefined}
               id="popular-news"
               data-bs-toggle="tab"
               data-bs-target="#popular-news-pane"
@@ -154,6 +278,12 @@ const ArticleSidebar = ({ mostViewed, popularNews, globalSettings: rawGlobalSett
              {popularNews && popularNews.length > 0 ? (
                 popularNews.slice(0, 5).map((item, index) => {
                     const data = item.attributes || item;
+                    const articleId = getArticleId(item, data);
+                    const fallbackLikeCount = getLikeFallbackCount(data);
+                    const currentLikeCount = articleId
+                      ? (likeCounts[String(articleId)] ?? fallbackLikeCount)
+                      : fallbackLikeCount;
+                    const isLiked = articleId ? Boolean(likedArticles[String(articleId)]) : false;
                     return (
                       <div className="p-post" key={index}>
                         <h4>
@@ -162,16 +292,23 @@ const ArticleSidebar = ({ mostViewed, popularNews, globalSettings: rawGlobalSett
                           </Link>
                         </h4>
                         <ul className="authar-info d-flex flex-wrap justify-content-center">
-                          <li className="date">
-                            <Link href="#">
-                              <p className="social-text">{t('subscribers')}</p> {formatDate(data.publishedAt, locale)}
-                            </Link>
+                          <li className="meta-label">
+                            <span className="social-text">{formatCount(subscriberCount)} {t('subscribers')}</span>
                           </li>
                           <li className="like">
-                            <Link href="#">
+                            <button
+                              type="button"
+                              className={`like-action-btn ${isLiked ? 'is-active' : ''}`}
+                              onClick={() => handleLikeClick(articleId, fallbackLikeCount)}
+                              disabled={!articleId || likePending[articleId]}
+                              aria-pressed={isLiked}
+                            >
                               <i className="ti ti-thumb-up" />
-                              {data.likes || 0} likes
-                            </Link>
+                              {formatCount(currentLikeCount)} {locale === 'bn' ? 'লাইক' : 'Likes'}
+                            </button>
+                          </li>
+                          <li className="date">
+                            <span>{formatDate(data.publishedAt, locale)}</span>
                           </li>
                         </ul>
                         {data.rating > 0 && (

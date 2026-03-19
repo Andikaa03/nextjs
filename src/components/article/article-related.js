@@ -4,7 +4,7 @@ import "owl.carousel/dist/assets/owl.carousel.css";
 import "owl.carousel/dist/assets/owl.theme.default.css";
 import 'animate.css/animate.css'
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getStrapiMedia, formatDate } from "@/lib/strapi";
 import { useTranslations } from '@/lib/translations';
 
@@ -20,6 +20,8 @@ const ArticleRelated = ({ articles, locale = 'bn', articleSlug = '', articleTitl
     const { t } = useTranslations(locale);
     const [articleUrl, setArticleUrl] = useState('');
     const [isSaved, setIsSaved] = useState(false);
+    const [isShareOpen, setIsShareOpen] = useState(false);
+    const shareRef = useRef(null);
 
     useEffect(() => {
         if (articleSlug) {
@@ -32,6 +34,17 @@ const ArticleRelated = ({ articles, locale = 'bn', articleSlug = '', articleTitl
             } catch (e) {}
         }
     }, [articleSlug]);
+
+    useEffect(() => {
+        const handleOutsideClick = (event) => {
+            if (shareRef.current && !shareRef.current.contains(event.target)) {
+                setIsShareOpen(false);
+            }
+        };
+
+        document.addEventListener('click', handleOutsideClick);
+        return () => document.removeEventListener('click', handleOutsideClick);
+    }, []);
 
     const optionThree = {
         items: 1,
@@ -64,6 +77,13 @@ const ArticleRelated = ({ articles, locale = 'bn', articleSlug = '', articleTitl
     const handleShareClick = (e, url) => {
         e.preventDefault();
         window.open(url, 'share', 'width=600,height=400,menubar=no,toolbar=no');
+        setIsShareOpen(false);
+    };
+
+    const toggleShareMenu = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsShareOpen((prev) => !prev);
     };
 
     const toggleSaveArticle = (e) => {
@@ -144,7 +164,7 @@ const ArticleRelated = ({ articles, locale = 'bn', articleSlug = '', articleTitl
                         <div className="social">
                             <ul>
                                 <li>
-                                    <div className="share transition">
+                                    <div ref={shareRef} className={`share transition ${isShareOpen ? 'is-open' : ''}`}>
                                         <a
                                             href="#"
                                             className="ico fb"
@@ -177,7 +197,15 @@ const ArticleRelated = ({ articles, locale = 'bn', articleSlug = '', articleTitl
                                         >
                                             <i className="fab fa-pinterest-p" />
                                         </a>
-                                        <i className="ti ti-share ico-share" style={{ cursor: 'pointer' }} onClick={() => {}} />
+                                        <button
+                                            type="button"
+                                            className="share-toggle-btn"
+                                            onClick={toggleShareMenu}
+                                            aria-label="Open share options"
+                                            aria-expanded={isShareOpen}
+                                        >
+                                            <i className="ti ti-share ico-share" style={{ cursor: 'pointer' }} />
+                                        </button>
                                     </div>
                                 </li>
                                 <li>

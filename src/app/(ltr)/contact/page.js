@@ -131,6 +131,17 @@ const page = () => {
         }
     };
 
+    const withLineBreaks = (value, fallback) => {
+        const text = (value || fallback || "").toString();
+        return text
+            .replace(/<br\s*\/?\s*>/gi, "\n")
+            .replace(/\r\n/g, "\n")
+            .split("\n")
+            .map((line) => line.trim())
+            .filter(Boolean)
+            .join("\n");
+    };
+
     return (
         <Layout hideMiddleHeader={true} globalSettings={globalSettings}>
             {/* START PAGE TITLE */}
@@ -160,7 +171,7 @@ const page = () => {
             {/* END OF /. PAGE TITLE */}
           
             {/* *** START PAGE MAIN CONTENT *** */}
-            <main className="page_main_wrapper">
+            <main className="page_main_wrapper contact-page">
                 <div className="container">
                     <div className="row row-m">
                         <div className="col-sm-7 col-md-8 main-content col-p">
@@ -170,18 +181,18 @@ const page = () => {
                                     <div className="panel_inner">
                                         <div className="panel_header">
                                             <h4>
-                                                <strong style={{ fontSize: '1.5rem', color: '#eee' }}>{contactData?.formSubtitle || t.subTitle}</strong>
+                                                <strong className="contact-section-title contact-section-title-lg">{contactData?.formSubtitle || t.subTitle}</strong>
                                             </h4>
                                         </div>
                                         <div className="panel_body">
-                                            <p className="fs-5">
+                                            <p className="fs-5 contact-form-description">
                                                 {contactData?.contactDescription || ""}
                                             </p>
                                             <form className="comment-form" onSubmit={handleSubmit}>
                                                 <div className="row">
                                                     <div className="col-sm-6">
                                                         <div className="form-group">
-                                                            <label htmlFor="name" style={{ color: '#bbb', fontSize: '12px', fontWeight: '400' }}>{contactData?.formNameLabel || t.formName}*</label>
+                                                            <label htmlFor="name" className="contact-field-label">{contactData?.formNameLabel || t.formName}*</label>
                                                             <input
                                                                 type="text"
                                                                 className="form-control"
@@ -195,7 +206,7 @@ const page = () => {
                                                         </div>
                                                     </div>
                                                     <div className="col-sm-6">
-                                                        <label htmlFor="email" style={{ color: '#bbb', fontSize: '12px', fontWeight: '400' }}>{contactData?.formEmailLabel || t.formEmail}*</label>
+                                                        <label htmlFor="email" className="contact-field-label">{contactData?.formEmailLabel || t.formEmail}*</label>
                                                         <div className="form-group">
                                                             <input
                                                                 type="email"
@@ -211,7 +222,7 @@ const page = () => {
                                                     </div>
                                                     <div className="col-sm-6">
                                                         <div className="form-group">
-                                                            <label htmlFor="website" style={{ color: '#bbb', fontSize: '12px', fontWeight: '400' }}>{contactData?.formWebsiteLabel || t.formWebsite}</label>
+                                                            <label htmlFor="website" className="contact-field-label">{contactData?.formWebsiteLabel || t.formWebsite}</label>
                                                             <input
                                                                 type="text"
                                                                 className="form-control"
@@ -224,7 +235,7 @@ const page = () => {
                                                         </div>
                                                     </div>
                                                     <div className="col-sm-6">
-                                                        <label htmlFor="subject" style={{ color: '#bbb', fontSize: '12px', fontWeight: '400' }}>{contactData?.formSubjectLabel || t.formSubject}</label>
+                                                        <label htmlFor="subject" className="contact-field-label">{contactData?.formSubjectLabel || t.formSubject}</label>
                                                         <div className="form-group">
                                                             <input
                                                                 type="text"
@@ -239,7 +250,7 @@ const page = () => {
                                                     </div>
                                                 </div>
                                                  <div className="form-group">
-                                                    <label htmlFor="message" style={{ color: '#bbb', fontSize: '12px', fontWeight: '400' }}>{contactData?.formMessageLabel || t.formMessage}*</label>
+                                                    <label htmlFor="message" className="contact-field-label">{contactData?.formMessageLabel || t.formMessage}*</label>
                                                     <textarea
                                                         className="form-control"
                                                         id="message"
@@ -274,15 +285,17 @@ const page = () => {
                                 <div className="panel_inner">
                                     <div className="panel_header">
                                         <h4>
-                                            <strong style={{ fontSize: '1.6rem', color: '#eee' }}>{contactData?.contactInfoTitle || t.contactInfo}</strong>
+                                            <strong className="contact-section-title contact-section-title-xl">{contactData?.contactInfoTitle || t.contactInfo}</strong>
                                         </h4>
                                     </div>
-                                    <div className="panel_body" style={{ fontSize: '1.15rem' }}>
+                                    <div className="panel_body contact-info" style={{ fontSize: '1.15rem' }}>
                                         <address>
                                             {" "}
                                             <strong>{globalSettings?.siteName || 'News'}</strong>
-                                            <br /> <strong>{t.addressLabel}:</strong> {contactData?.contactAddress || t.addressNotSet}
-                                            <br /> <strong>{t.phoneLabel}:</strong> {contactData?.contactPhone || t.phoneNotSet}{" "}
+                                            <br /> <strong>{t.addressLabel}:</strong>{" "}
+                                            <span className="contact-info-text">{withLineBreaks(contactData?.contactAddress, t.addressNotSet)}</span>
+                                            <br /> <strong>{t.phoneLabel}:</strong>{" "}
+                                            <span className="contact-info-text">{withLineBreaks(contactData?.contactPhone, t.phoneNotSet)}</span>{" "}
                                             <br /> <strong>{t.emailLabel}:</strong> <a href={`mailto:${contactData?.contactEmail}`}>
                                                 {contactData?.contactEmail || t.emailNotSet}
                                             </a>{" "}

@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { formatDate, getStrapiMedia, toBengaliNumber } from '@/lib/strapi';
 import { getCurrentWeather } from '@/services/weatherService';
 import { getIpLocation } from '@/services/locationService';
@@ -271,6 +271,9 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
     const renderMenuItem = (item, index, visibilityClass = "") => {
         const component = item.__component;
         const data = item.attributes || item; // Handle both direct component data and relation data
+        const isBanglaLocale = locale === 'bn';
+        const megaHeadingStyle = isBanglaLocale ? { fontSize: '26px', fontWeight: 300, lineHeight: 1.3 } : undefined;
+        const megaItemStyle = isBanglaLocale ? { fontSize: '22px', fontWeight: 300, lineHeight: 1.3 } : undefined;
         
         // Handle Component: Navigation.base-link
         if (component === 'navigation.base-link') {
@@ -371,14 +374,14 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                 <div className="row">
                                     {categoryTree.map((parent, i) => (
                                         <div className="col-menu col-md-3" key={i}>
-                                            <h6 className="title">
-                                                <Link href={`/${parent.slug}`} style={{ color: '#e6005c' }}>{parent.name}</Link>
+                                            <h6 className="title" style={megaHeadingStyle}>
+                                                <Link href={`/${parent.slug}`} style={{ color: '#e6005c', ...(megaHeadingStyle || {}) }}>{parent.name}</Link>
                                             </h6>
                                             <div className="content">
                                                 <ul className="menu-col">
                                                     {(parent.children || []).map((child, j) => (
                                                         <li key={j}>
-                                                            <Link href={`/${child.slug}`}>
+                                                            <Link href={`/${child.slug}`} style={megaItemStyle}>
                                                                 {child.name}
                                                             </Link>
                                                         </li>
@@ -405,7 +408,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                             <div className="row">
                                 {sections.map((section, i) => (
                                     <div className="col-menu col-md-3" key={i}>
-                                        <h6 className="title">{section.heading}</h6>
+                                        <h6 className="title" style={megaHeadingStyle}>{section.heading}</h6>
                                         <div className="content">
                                             <ul className="menu-col">
                                                 {section.links?.map((link, j) => {
@@ -413,10 +416,10 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                                     const linkUrl = linkSlug.startsWith('http') || linkSlug === '#' ? linkSlug : (linkSlug.startsWith('/') ? linkSlug : `/${linkSlug}`);
                                                     return (
                                                         <li key={j}>
-                                                            <Link href={linkUrl} className="d-flex align-items-center gap-2">
+                                                            <Link href={linkUrl} className="d-flex align-items-center gap-2" style={megaItemStyle}>
                                                                 {link.icon && <img src={getStrapiMedia(link.icon)} alt="" style={{ width: '16px', height: '16px' }} />}
                                                                 <div>
-                                                                    <div className="fw-bold">{link.title}</div>
+                                                                    <div className={isBanglaLocale ? '' : 'fw-bold'} style={megaItemStyle}>{link.title}</div>
                                                                     {link.description && <small className="text-muted d-block" style={{ fontSize: '11px', lineHeight: '1.2' }}>{link.description}</small>}
                                                                 </div>
                                                             </Link>
@@ -518,10 +521,13 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
         if (!currentDate) return null;
         const parts = currentDate.split(', ');
         if (parts.length > 1) {
+            const dayLabel = locale === 'en' ? parts[0].toUpperCase() : parts[0];
             return (
                 <>
-                    <span style={{ color: '#e6005c' }}>{parts[0]}</span>
-                    {', ' + parts.slice(1).join(', ')}
+                    <span style={{ color: '#e6005c', fontSize: locale === 'en' ? '1.12em' : '1.25em' }}>{dayLabel}</span>
+                    <span className="date-inline-separator">, </span>
+                    <br className="date-line-break" />
+                    {parts.slice(1).join(', ')}
                 </>
             );
         }
@@ -532,10 +538,10 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
         <>
             <header className={`main-header header-locale-${locale} home-nine`}>
                 {/* START HEADER TOP */}
-                <div className="header-top border-bottom" style={{ minHeight: '40.26px', maxHeight: '40.26px', display: 'flex', alignItems: 'center' }}>
-                    <div className="container">
-                        <div className="row">
-                            <div className="col">
+                <div className="header-top border-bottom" style={{ height: '34px', display: 'flex', alignItems: 'center' }}>
+                    <div className="container h-100">
+                        <div className="row h-100 align-items-center">
+                            <div className="col h-100 d-flex align-items-center">
                                 {/* Start top left menu */}
                                 <div className="d-flex top-left-menu">
                                     <ul className="align-items-center d-flex flex-wrap">
@@ -570,14 +576,28 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                 </div>
                                 {/* End of /. top left menu */}
                             </div>
-                            {/* Language Switcher - Mobile Only (centered) */}
-                            <div className="col-auto d-flex d-lg-none justify-content-center align-items-center w-100" style={{ position: 'absolute', left: 0, pointerEvents: 'none' }}>
-                                <div className="dropdown language-dropdown" style={{ pointerEvents: 'auto' }}>
+                            {/* Language Switcher - Mobile Only (right) */}
+                            <div className="col-auto h-100 d-flex d-lg-none align-items-center ms-auto me-2">
+                                <div className="dropdown language-dropdown">
+                                    <button className="btn p-0 dropdown-toggle d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style={{ color: '#fff', fontSize: '0.75rem', letterSpacing: '0.4px', textTransform: 'uppercase' }}>
+                                        <i className="fa-solid fa-earth-americas" />
+                                        <span className="fw-semibold">{locale === 'en' ? 'English' : 'বাংলা'}</span>
+                                    </button>
+                                    <ul className="dropdown-menu dropdown-menu-end">
+                                        <li><a className={`dropdown-item ${locale === 'bn' ? 'active' : ''}`} href="/bn"><span className="language-text">বাংলা</span></a></li>
+                                        <li><a className={`dropdown-item ${locale === 'en' ? 'active' : ''}`} href="/en"><span className="language-text">English</span></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            {/* end of /. Language Switcher */}
+                            {/* Language Switcher - Desktop */}
+                            <div className={`col-auto h-100 d-none d-lg-flex align-items-center ${headerTopData?.rightMenu?.length > 0 ? '' : 'ms-auto'}`}>
+                                <div className="dropdown language-dropdown">
                                     <button className="btn p-0 dropdown-toggle d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false" style={{ color: '#fff', fontSize: '0.781rem', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
                                         <i className="fa-solid fa-earth-americas" />
-                                        <span className="fw-semibold">{locale === 'en' ? 'En' : 'বাং'}</span>
+                                        <span className="fw-semibold">{locale === 'en' ? 'English' : 'বাংলা'}</span>
                                     </button>
-                                    <ul className="dropdown-menu">
+                                    <ul className="dropdown-menu dropdown-menu-end">
                                         <li><a className={`dropdown-item ${locale === 'bn' ? 'active' : ''}`} href="/bn"><span className="language-text">বাংলা</span></a></li>
                                         <li><a className={`dropdown-item ${locale === 'en' ? 'active' : ''}`} href="/en"><span className="language-text">English</span></a></li>
                                     </ul>
@@ -586,7 +606,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                             {/* end of /. Language Switcher */}
                             {/* Start header top right menu */}
                             {headerTopData?.rightMenu?.length > 0 && (
-                            <div className="col-auto ms-auto">
+                            <div className="col-auto h-100 ms-auto d-flex align-items-center">
                                 <div className="header-right-menu">
                                     <ul className="d-flex justify-content-end">
                                         {headerTopData.rightMenu.map((item, i) => (
@@ -676,7 +696,7 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className={`col text-end text-uppercase date-text ${locale === 'bn' ? 'date-text-bn' : ''}`}>{renderDate()}</div>
+                                <div className={`col text-end date-text ${locale === 'bn' ? 'date-text-bn text-uppercase' : 'date-text-en'}`}>{renderDate()}</div>
                             </div>
                         </div>
                     </div>
@@ -819,7 +839,12 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                                     return (
                                         <li className="nav-item" key={data.id || index}>
                                             <div className="d-flex align-items-center justify-content-between">
-                                                <Link className="nav-link flex-grow-1 fw-bold" href={finalUrl} onClick={closeSidebar}>
+                                                <Link
+                                                    className="nav-link flex-grow-1"
+                                                    href={finalUrl}
+                                                    onClick={closeSidebar}
+                                                    style={{ fontSize: '22px', fontWeight: 400, lineHeight: 1.4 }}
+                                                >
                                                     {title}
                                                 </Link>
                                             </div>

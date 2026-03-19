@@ -7,17 +7,6 @@ const DEFAULT_TIMEOUT_MS = Number(process.env.NEXT_PUBLIC_API_TIMEOUT_MS || 8000
  */
 export async function fetchAPI(path, options = {}) {
   const isServer = typeof window === 'undefined';
-  const defaultOptions = {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  };
-
-  // Add authorization only on the server side
-  if (isServer && SERVER_API_TOKEN) {
-    defaultOptions.headers.Authorization = `Bearer ${SERVER_API_TOKEN}`;
-  }
-
   const { silent, timeoutMs = DEFAULT_TIMEOUT_MS, signal: externalSignal, ...fetchOptions } = options;
   const timeoutController = externalSignal ? null : new AbortController();
   const signal = externalSignal || timeoutController?.signal;
@@ -25,18 +14,40 @@ export async function fetchAPI(path, options = {}) {
     ? setTimeout(() => timeoutController.abort(), timeoutMs)
     : null;
 
-  const mergedOptions = {
-    ...defaultOptions,
-    ...fetchOptions,
-    signal,
-  };
-
   const requestUrl = isServer
     ? `${STRAPI_URL}/api${path}`
     : `/api/strapi${path}`;
+
+  const buildRequestOptions = (includeAuth = true) => {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(fetchOptions.headers || {}),
+    };
+
+    if (isServer && SERVER_API_TOKEN && includeAuth) {
+      headers.Authorization = `Bearer ${SERVER_API_TOKEN}`;
+    }
+
+    return {
+      ...fetchOptions,
+      headers,
+      signal,
+    };
+  };
   
   try {
-    const response = await fetch(requestUrl, mergedOptions);
+    let response = await fetch(requestUrl, buildRequestOptions(true));
+
+    if (
+      response.status === 401 &&
+      isServer &&
+      SERVER_API_TOKEN
+    ) {
+      if (!silent) {
+        console.warn('Strapi API returned 401 with token; retrying without Authorization header.');
+      }
+      response = await fetch(requestUrl, buildRequestOptions(false));
+    }
     
     if (!response.ok) {
       if (!silent) {

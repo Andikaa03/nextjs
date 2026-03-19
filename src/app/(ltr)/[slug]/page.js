@@ -319,12 +319,12 @@ const CategoryPage = () => {
                     <div className="container">
                         <div className="row thm-margin">
                             {/* LEFT: Slider */}
-                            <div className="col-md-6 thm-padding">
+                            <div className="col-12 col-md-6 thm-padding">
                                 <div className="slider-wrapper">
                                     {loading ? (
                                         <SliderSkeleton t={t} />
                                     ) : (
-                                        <OwlCarousel key={`slider-${articles.length}`} id="owl-slider" className="owl-theme" {...carouselOptions}>
+                                        <OwlCarousel key={`slider-${articles.length}`} id="owl-slider" className="owl-carousel owl-theme" {...carouselOptions}>
                                             {sliderArticles.map((article) => (
                                                 <SliderItem key={article.id} article={article} categoryName={categoryName} locale={locale} />
                                             ))}
@@ -333,7 +333,7 @@ const CategoryPage = () => {
                                 </div>
                             </div>
                             {/* RIGHT: 2x2 grid */}
-                            <div className="col-md-6 thm-padding">
+                            <div className="col-12 col-md-6 thm-padding">
                                 <div className="row slider-right-post thm-margin">
                                     {loading
                                         ? SKELETON_ARTICLES.slice(0, 4).map((_, i) => (
