@@ -1,13 +1,9 @@
 "use client"
-import StickyBox from "react-sticky-box";
 import dynamic from "next/dynamic";
-import NewsTicker from "@/components/ltr/news-ticker-carousal/page";
 import SunnyWeather from "@/components/ltr/sunny-wether/sunny-weather";
 import { useBackgroundImageLoader } from "@/components/ltr/use-background-image/use-background-image";
 import Layout from "@/components/ltr/layout/layout";
 import useRemoveBodyClass from "@/components/ltr/useEffect-hook/useEffect-hook";
-import HomeFeatureCarousal from "@/components/ltr/home-feature-carousal/home-feature-carousal";
-import HomeCenterSlider from "@/components/ltr/home-center-slider/home-center-slider";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getTopNewsArticles, getHeadlineArticles, getTopSliderArticles, getMiddleSliderArticles, getMostReadArticles, getPopularNewsArticles, getTechInnovationArticles, getEditorChoiceArticles, getRecentPostArticles, getRecentReviewArticles, getLatestArticles } from "@/services/articleService";
@@ -22,6 +18,10 @@ const YoutubeVideo = dynamic(() => import("@/components/ltr/youtube-video/youtub
 const DatePickerComponents = dynamic(() => import("@/components/ltr/date-picker/date-picker"), { ssr: false });
 const PollWidget = dynamic(() => import("@/components/ltr/poll-widget/poll"), { ssr: false });
 const Tags = dynamic(() => import("@/components/ltr/tags/tags"), { ssr: false });
+const StickyBox = dynamic(() => import("react-sticky-box"), { ssr: false });
+const NewsTicker = dynamic(() => import("@/components/ltr/news-ticker-carousal/page"), { ssr: false });
+const HomeFeatureCarousal = dynamic(() => import("@/components/ltr/home-feature-carousal/home-feature-carousal"), { ssr: false });
+const HomeCenterSlider = dynamic(() => import("@/components/ltr/home-center-slider/home-center-slider"), { ssr: false });
 
 // Helper: get article data (supports both v4 and v5)
 const getArt = (article, locale = 'bn') => {

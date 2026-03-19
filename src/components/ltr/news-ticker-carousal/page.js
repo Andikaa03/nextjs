@@ -1,6 +1,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { useEffect } from "react";
 import "owl.carousel/dist/assets/owl.carousel.css";
 import "owl.carousel/dist/assets/owl.theme.default.css";
 import 'animate.css/animate.css'
@@ -27,10 +28,6 @@ const dictionary = {
   }
 };
 
-
-if (typeof window !== "undefined") {
-  window.$ = window.jQuery = typeof window !== "undefined" && require("jquery");
-}
 // This is for Next.js. On Rect JS remove this line
 const OwlCarousel = dynamic(() => import("react-owl-carousel"), {
   ssr: false,
@@ -39,6 +36,20 @@ const OwlCarousel = dynamic(() => import("react-owl-carousel"), {
 const NewsTicker = ({ data = [], isLoading = false }) => {
   const { locale } = useLanguage();
   const t = dictionary[locale] || dictionary.bn;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const loadJQuery = async () => {
+      if (!window.jQuery) {
+        const jqueryModule = await import('jquery');
+        const jquery = jqueryModule.default || jqueryModule;
+        window.$ = window.jQuery = jquery;
+      }
+    };
+
+    loadJQuery();
+  }, []);
   
   // Use dummy data if loading, otherwise real data
   let items = isLoading ? t.dummy : data;

@@ -5,7 +5,7 @@ import { getStrapiMedia } from "@/lib/strapi";
 import "owl.carousel/dist/assets/owl.carousel.css";
 import "owl.carousel/dist/assets/owl.theme.default.css";
 import 'animate.css/animate.css'
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLanguage } from '@/lib/LanguageContext';
 
 const dictionary = {
@@ -19,9 +19,6 @@ const dictionary = {
   }
 };
 
-if (typeof window !== "undefined") {
-  window.$ = window.jQuery = typeof window !== "undefined" && require("jquery");
-}
 const OwlCarousel = dynamic(() => import("react-owl-carousel"), {
   ssr: false,
 });
@@ -30,6 +27,20 @@ const HomeFeatureCarousal = ({ data = [], isLoading = false }) => {
   const { locale } = useLanguage();
   const t = dictionary[locale] || dictionary.bn;
   const items = data;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const loadJQuery = async () => {
+      if (!window.jQuery) {
+        const jqueryModule = await import('jquery');
+        const jquery = jqueryModule.default || jqueryModule;
+        window.$ = window.jQuery = jquery;
+      }
+    };
+
+    loadJQuery();
+  }, []);
 
   if (!isLoading && items.length === 0) return null;
 
