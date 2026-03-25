@@ -3,22 +3,23 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const LanguageContext = createContext();
 
-export const LanguageProvider = ({ children }) => {
-    const [locale, setLocale] = useState('bn');
+const normalizeLocale = (value) => (value === 'en' ? 'en' : 'bn');
+
+export const LanguageProvider = ({ children, initialLocale = 'bn' }) => {
+    const [locale, setLocale] = useState(normalizeLocale(initialLocale));
 
     useEffect(() => {
-        // Simple cookie getter
         const getCookie = (name) => {
             const value = `; ${document.cookie}`;
             const parts = value.split(`; ${name}=`);
             if (parts.length === 2) return parts.pop().split(';').shift();
         };
 
-        const cookieLocale = getCookie('NEXT_LOCALE');
-        if (cookieLocale) {
+        const cookieLocale = normalizeLocale(getCookie('NEXT_LOCALE'));
+        if (cookieLocale && cookieLocale !== locale) {
             setLocale(cookieLocale);
         }
-    }, []);
+    }, [locale]);
 
     useEffect(() => {
         if (typeof document !== 'undefined') {

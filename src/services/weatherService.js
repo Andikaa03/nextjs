@@ -39,13 +39,20 @@ function formatLocationLabel(location, locale = 'en') {
 async function getLocationName(lat, lon, locale = 'en') {
   try {
     const language = locale === 'bn' ? 'bn' : 'en';
-    const reverseUrl = `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&language=${language}&count=1`;
-    const response = await fetch(reverseUrl);
+    // Nominatim supports true reverse geocoding (lat/lon → name)
+    const reverseUrl = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=${language}`;
+    const response = await fetch(reverseUrl, {
+      headers: { 'User-Agent': 'SatyadharaProtidin/1.0 (news portal)' },
+      next: { revalidate: 86400 }, // location name rarely changes — cache 24h
+    });
     if (!response.ok) throw new Error('Reverse geocoding failed');
 
     const data = await response.json();
-    const location = data?.results?.[0] || null;
-    return formatLocationLabel(location, locale);
+    const addr = data?.address || {};
+    const city = addr.city || addr.town || addr.village || addr.county || '';
+    const country = addr.country || '';
+    if (!city && !country) return '';
+    return city && country && city !== country ? `${city}, ${country}` : city || country;
   } catch (error) {
     console.error('Location lookup error:', error);
     return '';
@@ -65,10 +72,11 @@ function localizeWeatherDescription(description, locale = 'en') {
  * @param {number} lon - Longitude (defaults to Dhaka)
  * @returns {Promise<{temp: number, weatherCode: number, description: string, icon: string}>}
  */
-export async function getCurrentWeather(lat = DEFAULT_LAT, lon = DEFAULT_LON, locale = 'en') {
+export async function getCurrentWeather(lat = DEFAULT_LAT, lon = DEFAULT_LON, locale = 'en', { noCache = false } = {}) {
   try {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&temperature_unit=celsius&timezone=auto`;
-    const response = await fetch(url, { next: { revalidate: 1800 } }); // cache 30 min
+    const fetchOpts = noCache ? { cache: 'no-store' } : { next: { revalidate: 1800 } };
+    const response = await fetch(url, fetchOpts);
     if (!response.ok) throw new Error('Weather fetch failed');
     const data = await response.json();
 

@@ -4,8 +4,8 @@ import { getGlobalSettings, getAdsManagement } from '@/services/globalService';
 import { getStrapiMedia } from '@/lib/strapi';
 import ClientArticleDetail from '@/components/article/article-details';
 
-// Force dynamic rendering since we rely on request params and external data
-export const dynamic = 'force-dynamic';
+// Enable ISR - cache articles for 60 seconds, then revalidate
+export const revalidate = 60;
 
 export async function generateMetadata({ params }) {
   const { slug } = params;
@@ -75,22 +75,22 @@ const ArticleDetailPage = async ({ params, searchParams }) => {
   const fetchLocale = isEnabled ? previewLocale : locale;
 
   try {
+    // Only fetch critical data on server
+    // Sidebar and ads can be fetched on client to avoid blocking initial render
     const results = await Promise.allSettled([
       articleFetcher(slug, fetchLocale),
-      getMostViewedArticles(5, locale),
-      getPopularArticles(5, locale),
-      getGlobalSettings(locale),
-      getAdsManagement(),
     ]);
 
     articleData = results[0].status === 'fulfilled' ? results[0].value : null;
-    mostViewedResponse = results[1].status === 'fulfilled' ? results[1].value : { data: [] };
-    popularResponse = results[2].status === 'fulfilled' ? results[2].value : { data: [] };
-    globalSettingsResponse = results[3].status === 'fulfilled' ? results[3].value : { data: null };
-    const adsRaw = results[4].status === 'fulfilled' ? results[4].value : null;
-    adsResponse = { data: adsRaw?.data || adsRaw || null };
+    
+    // Fetch non-critical data in parallel on client side
+    // For now, provide empty defaults - client will fetch these
+    mostViewedResponse = { data: [] };
+    popularResponse = { data: [] };
+    globalSettingsResponse = { data: null };
+    adsResponse = { data: null };
   } catch (error) {
-    console.error("Error fetching data for article page:", error);
+    console.error("Error fetching article:", error);
   }
 
   if (!articleData) {

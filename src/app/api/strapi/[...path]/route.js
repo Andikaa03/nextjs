@@ -1,5 +1,6 @@
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'https://app.shottyodharaprotidin.com';
+const STRAPI_URL = process.env.STRAPI_URL || process.env.NEXT_PUBLIC_STRAPI_URL || 'https://app.shottyodharaprotidin.com';
 const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
+const STRAPI_TIMEOUT_MS = Number(process.env.STRAPI_TIMEOUT_MS || 20000);
 
 async function proxyToStrapi(request, { params }) {
   const pathSegments = params?.path || [];
@@ -35,7 +36,28 @@ async function proxyToStrapi(request, { params }) {
     requestInit.body = requestBody;
   }
 
-  let strapiResponse = await fetch(targetUrl.toString(), requestInit);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), STRAPI_TIMEOUT_MS);
+  requestInit.signal = controller.signal;
+
+  let strapiResponse;
+  try {
+    strapiResponse = await fetch(targetUrl.toString(), requestInit);
+  } catch (error) {
+    if (error?.name === 'AbortError') {
+      return new Response(JSON.stringify({ error: { message: 'Upstream Strapi timeout' } }), {
+        status: 504,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    return new Response(JSON.stringify({ error: { message: 'Upstream Strapi request failed' } }), {
+      status: 502,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
 
   if (strapiResponse.status === 401 && STRAPI_API_TOKEN) {
     const retryHeaders = new Headers(headers);

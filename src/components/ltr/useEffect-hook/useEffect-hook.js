@@ -1,9 +1,10 @@
 "use client"
 
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 
 const useRemoveBodyClass = (classNamesToAdd, classNamesToRemove) => {
-  useEffect(() => {
+  // Apply layout classes before paint to avoid visible width/theme jumps.
+  useLayoutEffect(() => {
     if (classNamesToRemove && classNamesToRemove.length > 0) {
       classNamesToRemove.forEach(className => {
         document.body.classList.remove(className);

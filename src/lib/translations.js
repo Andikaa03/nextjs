@@ -44,6 +44,8 @@ export const translations = {
     // Reply Messages
     replyingTo: 'উত্তর দিচ্ছেন',
     cancel: 'বাতিল',
+    commentSubmitted: 'মন্তব্য সফলভাবে জমা হয়েছে।',
+    commentFailed: 'মন্তব্য জমা দেওয়া যায়নি। আবার চেষ্টা করুন।',
     
     // Load More
     loadMoreComments: 'আরও মন্তব্য লোড করুন',
@@ -131,6 +133,8 @@ export const translations = {
     // Reply Messages
     replyingTo: 'Replying to',
     cancel: 'Cancel',
+    commentSubmitted: 'Comment submitted successfully.',
+    commentFailed: 'Failed to submit comment. Please try again.',
     
     // Load More
     loadMoreComments: 'Load More Comments',

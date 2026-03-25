@@ -23,7 +23,11 @@ export async function getArticleBySlug(slug, locale = 'bn') {
   const strapiLocale = getStrapiLocale(locale);
   const queryParams = new URLSearchParams({
     'filters[slug][$eq]': slug,
-    'populate': '*',
+    'populate[0]': 'cover',
+    'populate[1]': 'author',
+    'populate[2]': 'category',
+    'populate[3]': 'tags',
+    'populate[4]': 'seo.shareImage',
     'locale': strapiLocale,
   });
   const data = await fetchAPI(`/articles?${queryParams}`);

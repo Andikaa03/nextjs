@@ -10,6 +10,9 @@ import { getLikeCount as fetchLikeCount, incrementLikeCount, decrementLikeCount 
 
 const ArticleSidebar = ({ mostViewed, popularNews, globalSettings: rawGlobalSettings, adsData, locale = 'bn' }) => {
   const { t } = useTranslations(locale);
+  const compactBnTabStyle = locale === 'bn'
+    ? { fontSize: '0.98rem', padding: '10px 8px', lineHeight: 1.2 }
+    : undefined;
   const globalSettings = rawGlobalSettings?.attributes || rawGlobalSettings;
   const [likeCounts, setLikeCounts] = useState({});
   const [likePending, setLikePending] = useState({});
@@ -27,10 +30,6 @@ const ArticleSidebar = ({ mostViewed, popularNews, globalSettings: rawGlobalSett
     const safeValue = toCount(value);
     return locale === 'bn' ? toBengaliNumber(safeValue) : safeValue;
   };
-
-  const subscriberCount = toCount(
-    globalSettings?.socialYoutubeSubscribers ?? globalSettings?.socialRssSubscribers ?? 0
-  );
 
   const getLikeFallbackCount = (articleData) => (
     toCount(articleData?.likes ?? articleData?.likeCount ?? articleData?.viewCount ?? 0)
@@ -58,30 +57,44 @@ const ArticleSidebar = ({ mostViewed, popularNews, globalSettings: rawGlobalSett
   useEffect(() => {
     let mounted = true;
 
-    const fetchLikes = async () => {
-      const items = (popularNews || []).slice(0, 5);
+    // Defer like count fetching to after page is interactive
+    // Use requestIdleCallback if available, otherwise setTimeout
+    const deferFetch = () => {
+      const fetchLikes = async () => {
+        const items = (popularNews || []).slice(0, 5);
 
-      const results = await Promise.all(
-        items.map(async (item) => {
-          const data = item.attributes || item;
-          const articleId = getArticleId(item, data);
-          if (!articleId) return null;
-          const likes = await fetchLikeCount(articleId);
-          return [String(articleId), likes];
-        })
-      );
+        const results = await Promise.all(
+          items.map(async (item) => {
+            const data = item.attributes || item;
+            const articleId = getArticleId(item, data);
+            if (!articleId) return null;
+            try {
+              const likes = await fetchLikeCount(articleId);
+              return [String(articleId), likes];
+            } catch {
+              return null;
+            }
+          })
+        );
 
-      if (!mounted) return;
+        if (!mounted) return;
 
-      const mapped = {};
-      results.forEach((entry) => {
-        if (!entry) return;
-        mapped[entry[0]] = entry[1];
-      });
-      setLikeCounts(mapped);
+        const mapped = {};
+        results.forEach((entry) => {
+          if (!entry) return;
+          mapped[entry[0]] = entry[1];
+        });
+        setLikeCounts(mapped);
+      };
+
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => fetchLikes());
+      } else {
+        setTimeout(fetchLikes, 1000);
+      }
     };
 
-    fetchLikes();
+    deferFetch();
 
     return () => {
       mounted = false;
@@ -133,7 +146,7 @@ const ArticleSidebar = ({ mostViewed, popularNews, globalSettings: rawGlobalSett
   };
 
   return (
-    <StickyBox offsetTop={100} offsetBottom={20}>
+    <StickyBox offsetTop={100} offsetBottom={20} className="article-sidebar-sticky">
       {/* START ADVERTISEMENT */}
       <div className="add-inner">
         <Link href={adsData?.articleBannerLink || '#'} target="_blank">
@@ -146,16 +159,13 @@ const ArticleSidebar = ({ mostViewed, popularNews, globalSettings: rawGlobalSett
         </Link>
       </div>
       {/* END OF /. ADVERTISEMENT */}
-      
-      {/* START SOCIAL COUNTER TEXT */}
-      <div className="align-items-center d-flex fs-6 justify-content-center mb-1 text-center social-counter-total">
+
+      {/* SOCIAL COUNTER */}
+      <div className="align-items-center d-flex fs-6 justify-content-center mb-1 mt-2 text-center social-counter-total">
         <i className="fa-solid fa-heart text-primary me-1" /> {t('joinFollowers')}{" "}
         <span className="fw-bold mx-1">{globalSettings?.socialTotalFollowers || '0'}</span> {t('followers')}
       </div>
-      {/* END OF /. SOCIAL COUNTER TEXT */}
-
-      {/* START SOCIAL ICON */}
-      <div className="social-media-inner mb-2">
+      <div className="social-media-inner social-media-inner--compact mb-2">
         <ul className="g-1 row social-media">
           <li className="col-4">
             <Link href={globalSettings?.socialRssUrl || '#'} className="rss" target="_blank">
@@ -201,15 +211,15 @@ const ArticleSidebar = ({ mostViewed, popularNews, globalSettings: rawGlobalSett
           </li>
         </ul>
       </div>
-      {/* END OF /. SOCIAL ICON */}
+      {/* END OF /. SOCIAL COUNTER */}
 
-      {/* START NAV TABS */}
+      {/* NAV TABS — Most Viewed / Popular */}
       <div className={`tabs-wrapper ${locale === 'bn' ? 'tabs-wrapper-bn' : 'tabs-wrapper-en'}`}>
         <ul className="nav nav-tabs" id="myTab" role="tablist">
           <li className="nav-item" role="presentation">
             <button
               className="nav-link border-0 active"
-              style={locale === 'bn' ? { fontSize: '1.16rem' } : undefined}
+              style={compactBnTabStyle}
               id="most-viewed"
               data-bs-toggle="tab"
               data-bs-target="#most-viewed-pane"
@@ -224,7 +234,7 @@ const ArticleSidebar = ({ mostViewed, popularNews, globalSettings: rawGlobalSett
           <li className="nav-item" role="presentation">
             <button
               className="nav-link border-0"
-              style={locale === 'bn' ? { fontSize: '1.16rem' } : undefined}
+              style={compactBnTabStyle}
               id="popular-news"
               data-bs-toggle="tab"
               data-bs-target="#popular-news-pane"
@@ -292,9 +302,6 @@ const ArticleSidebar = ({ mostViewed, popularNews, globalSettings: rawGlobalSett
                           </Link>
                         </h4>
                         <ul className="authar-info d-flex flex-wrap justify-content-center">
-                          <li className="meta-label">
-                            <span className="social-text">{formatCount(subscriberCount)} {t('subscribers')}</span>
-                          </li>
                           <li className="like">
                             <button
                               type="button"
@@ -328,6 +335,7 @@ const ArticleSidebar = ({ mostViewed, popularNews, globalSettings: rawGlobalSett
           </div>
         </div>
       </div>
+      {/* END OF /. NAV TABS */}
     </StickyBox>
   );
 };

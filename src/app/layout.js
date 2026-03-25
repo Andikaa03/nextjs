@@ -2,6 +2,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import "@icon/themify-icons/themify-icons.css"
 import './globals.css'
 
+import { cookies } from 'next/headers';
 import ImportJs from '@/components/ltr/import-js/import-js';
 import Providers from './theme-providers';
 import { getGlobalSettings } from '@/services/globalService';
@@ -28,7 +29,10 @@ export async function generateMetadata() {
 
     const metaImage = getStrapiMedia(seo.metaImage || seo.shareImage);
 
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://shottyodharaprotidin.com';
+
     return {
+      metadataBase: new URL(siteUrl),
       title: attrs.siteName || seo.metaTitle || 'Satyadhara Pratidin',
       description: seo.metaDescription || attrs.siteDescription || 'সত্যধারা প্রতিদিন - সত্যের সন্ধানে সর্বদা',
       keywords: seo.keywords || 'news, portal, bangladesh, update',
@@ -67,12 +71,19 @@ export async function generateMetadata() {
   }
 }
 
-export default function RootLayout({ children }) {
+function normalizeLocale(value) {
+  return value === 'en' ? 'en' : 'bn';
+}
+
+export default async function RootLayout({ children }) {
+  const cookieStore = await cookies();
+  const initialLocale = normalizeLocale(cookieStore.get('NEXT_LOCALE')?.value);
+
   return (
-    <html lang="en">
-      <body>
+    <html lang={initialLocale} data-theme="skin-dark" suppressHydrationWarning>
+      <body className={`locale-${initialLocale}`}>
         <ImportJs />
-        <Providers>  
+        <Providers initialLocale={initialLocale}>  
           {children}
         </Providers>
       </body>

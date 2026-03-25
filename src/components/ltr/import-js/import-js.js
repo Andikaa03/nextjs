@@ -3,7 +3,9 @@ import { useEffect } from "react";
 
 export default function ImportJs() {
     useEffect(() => {
-        require("bootstrap/dist/js/bootstrap.bundle.min");
+        import("bootstrap/dist/js/bootstrap.bundle.min.js").catch((error) => {
+            console.error("Failed to load Bootstrap bundle:", error);
+        });
     }, []);
     return null;
 }

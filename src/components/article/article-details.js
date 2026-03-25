@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
+import { useState, useEffect } from "react";
 import StickyBox from "react-sticky-box";
 import Layout from "@/components/ltr/layout/layout";
 import ArticleRelated from "@/components/article/article-related";
@@ -11,13 +13,63 @@ import { getStrapiMedia, formatDate } from '@/lib/strapi';
 import { useTranslations } from '@/lib/translations';
 import StrapiBlocks from '@/components/article/strapi-blocks';
 import SocialShare from '@/components/article/social-share';
+import { getMostViewedArticles, getPopularArticles } from '@/services/articleService';
+import { getGlobalSettings, getAdsManagement } from '@/services/globalService';
 
-const ClientArticleDetail = ({ article, mostViewed, popularNews, globalSettings, adsData, locale = 'bn' }) => {
+const ClientArticleDetail = ({ article, mostViewed = [], popularNews = [], globalSettings, adsData, locale = 'bn' }) => {
   useRemoveBodyClass(['None'], ['home-seven', 'home-nine','boxed-layout','home-six']);
   const { t } = useTranslations(locale);
   
+  const [sidebarData, setSidebarData] = useState({
+    mostViewed: mostViewed,
+    popularNews: popularNews,
+    globalSettings: globalSettings,
+    adsData: adsData,
+    loading: !globalSettings, // If globalSettings is empty, sidebar data is loading
+  });
+
+  // Fetch sidebar data on client to avoid blocking article render
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchSidebarData = async () => {
+      try {
+        const [mostViewedRes, popularRes, settingsRes, adsRes] = await Promise.all([
+          getMostViewedArticles(5, locale),
+          getPopularArticles(5, locale),
+          getGlobalSettings(locale),
+          getAdsManagement(),
+        ]);
+
+        if (!mounted) return;
+
+        setSidebarData({
+          mostViewed: mostViewedRes?.data || [],
+          popularNews: popularRes?.data || [],
+          globalSettings: settingsRes?.data,
+          adsData: adsRes?.data,
+          loading: false,
+        });
+      } catch (error) {
+        console.error('Error fetching sidebar data:', error);
+        if (mounted) {
+          setSidebarData((prev) => ({ ...prev, loading: false }));
+        }
+      }
+    };
+
+    if (!globalSettings) {
+      fetchSidebarData();
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, [locale, globalSettings]);
+  
   const data = article.attributes || article;
   const { title, content, cover, publishedAt, author, views } = data;
+  const categorySlug = data.category?.data?.attributes?.slug || data.category?.slug || "";
   const authorName = author?.data?.attributes?.name || t('editor');
   const imageUrl = getStrapiMedia(cover);
 
@@ -36,7 +88,7 @@ const ClientArticleDetail = ({ article, mostViewed, popularNews, globalSettings,
   return (
     <Layout hideMiddleHeader={true} globalSettings={globalSettings}>
       {/* *** START PAGE MAIN CONTENT *** */}
-      <main className={`page_main_wrapper ${locale === 'en' ? 'locale-en' : ''}`}>
+      <main className={`page_main_wrapper article-page-wrapper ${locale === 'en' ? 'locale-en' : ''}`}>
         {/* START PAGE TITLE */}
         <div className="page-title">
           <div className="container">
@@ -59,18 +111,21 @@ const ClientArticleDetail = ({ article, mostViewed, popularNews, globalSettings,
         </div>
         {/* END OF /. PAGE TITLE */}
         <div className="container">
-          <div className="row row-m">
+          <div className="row row-m article-layout-row">
             {/* START MAIN CONTENT */}
-            <div className="col-md-8 col-p main-content">
-              <StickyBox>
+            <div className="col-p main-content article-main-content">
+              <div>
                 <div className="post_details_inner">
                   <div className="post_details_block">
                     {imageUrl && (
                         <figure className="social-icon">
-                            <img
+                            <Image
                                 src={imageUrl}
                                 className="img-fluid"
                                 alt={title}
+                                width={800}
+                                height={450}
+                                priority
                                 onError={(e) => e.target.style.display = 'none'}
                             />
                             {/* Floating Social Share Buttons */}
@@ -119,23 +174,23 @@ const ClientArticleDetail = ({ article, mostViewed, popularNews, globalSettings,
                 {/* START RELATED ARTICLES - Hide if isAbout is true */}
                 {!data.isAbout && (
                   <>
-                    <ArticleRelated articles={mostViewed} locale={locale} articleSlug={data.slug} articleTitle={title} />
+                    <ArticleRelated articles={sidebarData.mostViewed} locale={locale} articleSlug={data.slug} articleTitle={title} categorySlug={categorySlug} />
                     <ArticleComments articleSlug={data.slug} articleDocumentId={article.documentId || article.id} locale={locale} />
                   </>
                 )}
                 {/* END OF /. RELATED ARTICLES */}
               
-              </StickyBox>
+              </div>
             </div>
             {/* END OF /. MAIN CONTENT */}
 
             {/* START SIDE CONTENT */}
-            <div className="col-md-4 col-md-4 col-p rightSidebar">
+            <div className="col-p rightSidebar article-sidebar-col">
                <ArticleSidebar 
-                  mostViewed={mostViewed} 
-                  popularNews={popularNews} 
-                  globalSettings={globalSettings} 
-                  adsData={adsData}
+                  mostViewed={sidebarData.mostViewed} 
+                  popularNews={sidebarData.popularNews} 
+                  globalSettings={sidebarData.globalSettings} 
+                  adsData={sidebarData.adsData}
                   locale={locale} 
                />
             </div>

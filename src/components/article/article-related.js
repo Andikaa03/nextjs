@@ -1,5 +1,6 @@
 "use client"
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import "owl.carousel/dist/assets/owl.carousel.css";
 import "owl.carousel/dist/assets/owl.theme.default.css";
 import 'animate.css/animate.css'
@@ -16,7 +17,7 @@ const OwlCarousel = dynamic(() => import("react-owl-carousel"), {
     ssr: false,
 });
 
-const ArticleRelated = ({ articles, locale = 'bn', articleSlug = '', articleTitle = '' }) => {
+const ArticleRelated = ({ articles, locale = 'bn', articleSlug = '', articleTitle = '', categorySlug = '' }) => {
     const { t } = useTranslations(locale);
     const [articleUrl, setArticleUrl] = useState('');
     const [isSaved, setIsSaved] = useState(false);
@@ -73,6 +74,8 @@ const ArticleRelated = ({ articles, locale = 'bn', articleSlug = '', articleTitl
 
     const encodedUrl = encodeURIComponent(articleUrl);
     const encodedTitle = encodeURIComponent(articleTitle);
+    const fallbackCategorySlug = articles?.[0]?.attributes?.category?.data?.attributes?.slug || articles?.[0]?.category?.data?.attributes?.slug || articles?.[0]?.attributes?.category?.slug || articles?.[0]?.category?.slug || '';
+    const morePostsHref = categorySlug ? `/${categorySlug}` : (fallbackCategorySlug ? `/${fallbackCategorySlug}` : '/');
 
     const handleShareClick = (e, url) => {
         e.preventDefault();
@@ -127,10 +130,13 @@ const ArticleRelated = ({ articles, locale = 'bn', articleSlug = '', articleTitl
                                                 <div className="grid-item">
                                                     <div className="grid-item-img">
                                                         <Link href={`/article/${data.slug}`}>
-                                                            <img
+                                                            <Image
                                                                 src={imageUrl || '/default.jpg'}
                                                                 className="img-fluid"
                                                                 alt={data.title}
+                                                                width={300}
+                                                                height={200}
+                                                                onError={(e) => e.target.style.display = 'none'}
                                                             />
                                                         </Link>
                                                     </div>
@@ -156,7 +162,7 @@ const ArticleRelated = ({ articles, locale = 'bn', articleSlug = '', articleTitl
             <div className="post-footer">
                 <div className="row thm-margin">
                     <div className="col-md-8 thm-padding">
-                        <Link href="/news" className="more-btn">
+                        <Link href={morePostsHref} className="more-btn" style={locale !== 'bn' ? { fontSize: '13px' } : undefined}>
                             {t('morePopularPosts')}
                         </Link>
                     </div>

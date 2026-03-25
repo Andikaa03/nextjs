@@ -1,16 +1,18 @@
 /** @type {import('next').NextConfig} */
-const webpack = require('webpack');
 const nextConfig = {
   reactStrictMode: false,
-  webpack: (config, { webpack }) => {
-    config.plugins.push(
-      new webpack.ProvidePlugin({
-        $: 'jquery',
-        jQuery: 'jquery',
-        'window.jQuery': 'jquery',
-      })
-    );
-    return config;
+  output: 'standalone',
+  poweredByHeader: false,
+  experimental: {
+    serverComponentsExternalPackages: ['bangla-date-converter'],
+  },
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: 'app.shottyodharaprotidin.com' },
+      { protocol: 'https', hostname: 'shottyodharaprotidin.com' },
+    ],
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 3600,
   },
   
 };

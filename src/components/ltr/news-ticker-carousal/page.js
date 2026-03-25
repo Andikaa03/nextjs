@@ -1,10 +1,5 @@
 
-import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useEffect } from "react";
-import "owl.carousel/dist/assets/owl.carousel.css";
-import "owl.carousel/dist/assets/owl.theme.default.css";
-import 'animate.css/animate.css'
 import { useLanguage } from '@/lib/LanguageContext';
 
 const dictionary = {
@@ -28,36 +23,22 @@ const dictionary = {
   }
 };
 
-// This is for Next.js. On Rect JS remove this line
-const OwlCarousel = dynamic(() => import("react-owl-carousel"), {
-  ssr: false,
-});
-
 const NewsTicker = ({ data = [], isLoading = false }) => {
   const { locale } = useLanguage();
   const t = dictionary[locale] || dictionary.bn;
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const loadJQuery = async () => {
-      if (!window.jQuery) {
-        const jqueryModule = await import('jquery');
-        const jquery = jqueryModule.default || jqueryModule;
-        window.$ = window.jQuery = jquery;
-      }
-    };
-
-    loadJQuery();
-  }, []);
   
   // Use dummy data if loading, otherwise real data
-  let items = isLoading ? t.dummy : data;
-
-  // Clone if only 1 item to force Owl Carousel to loop and show navigation
-  if (!isLoading && items.length === 1) {
-    items = [items[0], items[0]];
-  }
+  const sourceItems = isLoading ? t.dummy : data;
+  const items = sourceItems
+    .map((article) => {
+      const articleData = article.attributes || article;
+      return {
+        id: article.id,
+        slug: articleData.slug || '#',
+        title: (articleData.title || '').trim(),
+      };
+    })
+    .filter((article) => article.title.length > 0);
 
   if (!isLoading && items.length === 0) return null;
 
@@ -67,37 +48,21 @@ const NewsTicker = ({ data = [], isLoading = false }) => {
         <div className={`trending ${locale === 'en' ? 'trending-en' : 'trending-bn'}`}>
           {t.trending} {t.now}
         </div>
-        <OwlCarousel
-          key={isLoading ? 'loading' : 'loaded'}
-          className="news-ticker owl-theme"
-          loop={true}
-          items={1}
-          dots={false}
-          animateOut='animate__slideOutDown'
-          animateIn='animate__flipInX'
-          autoplay={true}
-          autoplayTimeout={5000}
-          autoplayHoverPause={true}
-          nav={true}
-          navText={[
-            `<i class='fa fa-angle-left'></i>`,
-            `<i class='fa fa-angle-right'></i>`
-          ]}
-        >
-          {items.map((article) => {
-            const articleData = article.attributes || article;
-            const slug = articleData.slug || '#';
-            const title = articleData.title || '';
-
-            return (
-              <div className="item" key={article.id}>
-                <p>
-                  <Link href={isLoading ? '#' : `/article/${slug}`}>{title}</Link>
-                </p>
+        <div className="news-ticker" aria-live="polite">
+          <div className="news-ticker-track">
+            {[0, 1].map((copyIndex) => (
+              <div className="news-ticker-group" key={`copy-${copyIndex}`} aria-hidden={copyIndex === 1}>
+                {items.map((article, index) => {
+                  return (
+                    <span className="item" key={`${copyIndex}-${article.id || index}`}>
+                      <Link href={isLoading ? '#' : `/article/${article.slug}`}>{article.title}</Link>
+                    </span>
+                  );
+                })}
               </div>
-            );
-          })}
-        </OwlCarousel>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -44,6 +44,8 @@ const dictionary = {
     newsletter: {
       success: "Subscribed successfully!",
       duplicate: "This email is already subscribed.",
+      turnstile: "Please complete the verification and try again.",
+      forbidden: "Subscription is temporarily unavailable.",
       error: "Subscription failed. Please try again."
     },
     contact: {
@@ -95,6 +97,8 @@ const dictionary = {
     newsletter: {
       success: "সফলভাবে সাবস্ক্রাইব হয়েছে!",
       duplicate: "এই ইমেইল ইতিমধ্যে সাবস্ক্রাইব করা আছে।",
+      turnstile: "যাচাইকরণ সম্পন্ন করে আবার চেষ্টা করুন।",
+      forbidden: "সাবস্ক্রিপশন সাময়িকভাবে বন্ধ আছে।",
       error: "সাবস্ক্রিপশন ব্যর্থ হয়েছে। আবার চেষ্টা করুন।"
     },
     contact: {
@@ -269,6 +273,12 @@ const Footer = ({ hideMiddleHeader = false }) => {
                 } else if (result.error === 'duplicate') {
                   setNewsletterSuccess(false);
                   setNewsletterMessage(t.newsletter.duplicate);
+                } else if (result.error === 'turnstile') {
+                  setNewsletterSuccess(false);
+                  setNewsletterMessage(t.newsletter.turnstile);
+                } else if (result.error === 'forbidden') {
+                  setNewsletterSuccess(false);
+                  setNewsletterMessage(t.newsletter.forbidden);
                 } else {
                   setNewsletterSuccess(false);
                   setNewsletterMessage(t.newsletter.error);
@@ -340,33 +350,24 @@ const Footer = ({ hideMiddleHeader = false }) => {
             </div>
           </div>
           <hr className="mt-5 mb-4" />
-          <div className="row">
-            {/* START FOOTER BOX (Qr Code) */}
-            {!hideMiddleHeader && (
-              <div className="col-sm-6 col-lg-3 footer-box py-4 footer-hide-mobile">
-                <div className="about-inner text-center">
-                  <h5 className="wiget-title">{t.app.title}</h5>
-                  <div className="bg-white pb-0 mb-3 d-inline-block rounded">
-                    {/* Start Qr Code Image */}
-                    <img
-                      src={getStrapiMedia(footerAttrs?.appQrImage) || "/assets/images/qr-code.png"}
-                      height={180}
-                      width={180}
-                      alt="Qr Code"
-                    />
-                    {/* /. End Qr Code Image */}
-                  </div>
-                  <p>{footerAttrs?.appDescription || t.app.text}</p>
-                  
-
-                  
-                </div>
+          <div className="footer-main-grid">
+            {/* START FOOTER BOX (Address) */}
+            <div className="footer-box py-4 footer-address-box">
+              <h5 className="wiget-title">{footerAttrs?.editorialName || t.editorial.title}</h5>
+              <div className="text-white footer-editorial" style={{ fontSize: '14px', lineHeight: '1.6' }}>
+                <p className="mb-0">{footerAttrs?.editorialOffice || t.editorial.office}</p>
+                <p className="mb-0">{footerAttrs?.editorialAddress1 || t.editorial.address1}</p>
+                <p className="mb-0">{footerAttrs?.editorialAddress2 || t.editorial.address2}</p>
+                <p className="mb-0">{footerAttrs?.editorialPhone || t.editorial.phone}</p>
+                <p className="mb-0" style={{ fontSize: '12px', whiteSpace: 'nowrap' }}>{footerAttrs?.editorialEmail || t.editorial.email}</p>
+                <p className="mb-0">{footerAttrs?.editorialEditor || t.editorial.editor}</p>
+                <p className="mb-0">{footerAttrs?.editorialPublisher || t.editorial.publisher}</p>
               </div>
-            )}
-            {/*  END OF /. FOOTER BOX (Qr Code) */}
-            
+            </div>
+            {/* END OF /. FOOTER BOX (Address) */}
+
             {/* START FOOTER BOX (Social Contact - Dynamic) */}
-            <div className={hideMiddleHeader ? "col-sm-6 col-lg-4 footer-box py-4 footer-social-box" : "col-sm-6 col-lg-3 footer-box py-4 footer-social-box"}>
+            <div className="footer-box py-4 footer-social-box">
                <h5 className="wiget-title">{footerAttrs?.socialTitle || t.social}</h5>
                 <ul className="list-unstyled m-0 menu-services">
                     {footerAttrs?.socialLinks && footerAttrs.socialLinks.length > 0 ? (
@@ -386,23 +387,11 @@ const Footer = ({ hideMiddleHeader = false }) => {
                         </>
                     )}
                 </ul>
-
-                {/* Editorial Office Info */}
-                <div className="mt-5 text-white footer-editorial" style={{ fontSize: '14px', lineHeight: '1.6' }}>
-                  <h5 className="wiget-title mb-1">{footerAttrs?.editorialName || t.editorial.title}</h5>
-                  <p className="mb-0">{footerAttrs?.editorialOffice || t.editorial.office}</p>
-                  <p className="mb-0">{footerAttrs?.editorialAddress1 || t.editorial.address1}</p>
-                  <p className="mb-0">{footerAttrs?.editorialAddress2 || t.editorial.address2}</p>
-                  <p className="mb-0">{footerAttrs?.editorialPhone || t.editorial.phone}</p>
-                  <p className="mb-0" style={{ fontSize: '12px', whiteSpace: 'nowrap' }}>{footerAttrs?.editorialEmail || t.editorial.email}</p>
-                  <p className="mb-0">{footerAttrs?.editorialEditor || t.editorial.editor}</p>
-                  <p className="mb-0">{footerAttrs?.editorialPublisher || t.editorial.publisher}</p>
-                </div>
             </div>
             {/* END OF /. FOOTER BOX (Social Contact) */}
 
             {/* START FOOTER BOX (Category) */}
-            <div className={hideMiddleHeader ? "col-sm-6 col-lg-4 footer-box py-4 footer-hide-mobile" : "col-sm-6 col-lg-3 footer-box py-4 footer-hide-mobile"}>
+            <div className="footer-box py-4 footer-hide-mobile">
               <h5 className="wiget-title">{footerAttrs?.categoryTitle || t.category}</h5>
               <div className="row">
                 <div className="col-6">
@@ -432,7 +421,7 @@ const Footer = ({ hideMiddleHeader = false }) => {
             {/* END OF /. FOOTER BOX (Category) */}
 
             {/* START FOOTER BOX (Recent Post) */}
-            <div className={hideMiddleHeader ? "col-sm-6 col-lg-4 footer-box py-4 footer-hide-mobile" : "col-sm-6 col-lg-3 footer-box py-4 footer-hide-mobile"}>
+            <div className="footer-box py-4 footer-recent-mobile-hide">
               <h5 className="wiget-title">{t.recentPost}</h5>
               <div className="footer-news-grid">
                 {recentPosts.map((post, i) => {

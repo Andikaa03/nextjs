@@ -1,31 +1,19 @@
 "use client"
-import {useState, useEffect} from 'react'
 import { ThemeProvider } from 'next-themes'
 import { LanguageProvider } from '@/lib/LanguageContext'
 
-const Providers = ({children}) => {
-
-    const [mounted, setMounted] = useState(false)
-  
-    // useEffect only runs on the client, so now we can safely show the UI
-    useEffect(() => {
-      setMounted(true)
-    }, [])
-  
+const Providers = ({ children, initialLocale = 'bn' }) => {
   return (
-    <LanguageProvider>
-        {mounted ? (
-            <ThemeProvider 
-            attribute="data-theme"
-            defaultTheme="light" 
-            themes={['light', 'skin-dark']}
-            enableSystem={false}
-            >
-                {children}
-            </ThemeProvider>
-        ) : (
-            <>{children}</>
-        )}
+    <LanguageProvider initialLocale={initialLocale}>
+        <ThemeProvider 
+        attribute="data-theme"
+        defaultTheme="skin-dark"
+        themes={['light', 'skin-dark']}
+        enableSystem={false}
+        disableTransitionOnChange
+        >
+            {children}
+        </ThemeProvider>
     </LanguageProvider>
   )
 }

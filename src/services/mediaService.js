@@ -37,8 +37,7 @@ export async function getActivePoll(locale = 'bn') {
 
   try {
     const data = await fetchAPI(`/polls?${queryParams}`, {
-      cache: 'no-store',
-      next: { revalidate: 0 }
+      cache: 'no-store'
     });
     return data;
   } catch {

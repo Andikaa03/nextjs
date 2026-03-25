@@ -8,7 +8,6 @@ export async function getActivePolls(locale = 'bn') {
   try {
     return await fetchAPI(`/polls?filters[isActive][$eq]=true&populate=*&locale=${strapiLocale}`, {
       cache: 'no-store',
-      next: { revalidate: 0 }
     });
   } catch (error) {
     console.error('Error fetching active polls:', error);

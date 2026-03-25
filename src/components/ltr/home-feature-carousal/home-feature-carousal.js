@@ -1,11 +1,7 @@
-
-import dynamic from "next/dynamic";
+"use client";
 import Link from "next/link";
 import { getStrapiMedia } from "@/lib/strapi";
-import "owl.carousel/dist/assets/owl.carousel.css";
-import "owl.carousel/dist/assets/owl.theme.default.css";
-import 'animate.css/animate.css'
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useLanguage } from '@/lib/LanguageContext';
 
 const dictionary = {
@@ -19,28 +15,10 @@ const dictionary = {
   }
 };
 
-const OwlCarousel = dynamic(() => import("react-owl-carousel"), {
-  ssr: false,
-});
-
 const HomeFeatureCarousal = ({ data = [], isLoading = false }) => {
   const { locale } = useLanguage();
   const t = dictionary[locale] || dictionary.bn;
-  const items = data;
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const loadJQuery = async () => {
-      if (!window.jQuery) {
-        const jqueryModule = await import('jquery');
-        const jquery = jqueryModule.default || jqueryModule;
-        window.$ = window.jQuery = jquery;
-      }
-    };
-
-    loadJQuery();
-  }, []);
+  const items = data.slice(0, 8);
 
   if (!isLoading && items.length === 0) return null;
 
@@ -80,23 +58,9 @@ const HomeFeatureCarousal = ({ data = [], isLoading = false }) => {
   };
   
   return (
-    <OwlCarousel
-      key={isLoading ? 'loading' : 'loaded'}
-      className="owl-theme featured-carousel"
-      loop={true}
-      margin={10}
-      nav={false}
-      dots={false}
-      responsive={{
-        0: { items: 1, autoplay: true },
-        576: { items: 2 },
-        768: { items: 2.5 },
-        992: { items: 3.5 },
-        1200: { items: 4 }
-      }}
-    >
+    <div className="featured-carousel featured-carousel-static d-flex gap-3 overflow-auto align-items-start">
       {items.map((article, index) => renderItem(article, index, isLoading))}
-    </OwlCarousel>
+    </div>
   );
 };
 

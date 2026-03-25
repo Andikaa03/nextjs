@@ -5,13 +5,14 @@ import dynamic from 'next/dynamic';
 import React, { useEffect, useState, useRef } from 'react';
 import { formatDate, getStrapiMedia, toBengaliNumber } from '@/lib/strapi';
 import { getCurrentWeather } from '@/services/weatherService';
-import { getIpLocation } from '@/services/locationService';
+import { resolveClientLocation } from '@/services/locationService';
 import { getMenuItems, getAdsManagement, getHeaderTop } from '@/services/globalService';
 import { getCategoriesWithChildren } from '@/services/categoryService';
 import { useLanguage } from '@/lib/LanguageContext';
 import ThemeChanger from '../style-selectors/style-selector';
 
 const WiDaySunny = dynamic(() => import('weather-icons-react').then((mod) => mod.WiDaySunny), { ssr: false });
+const WiDayCloudy = dynamic(() => import('weather-icons-react').then((mod) => mod.WiDayCloudy), { ssr: false });
 const WiCloud = dynamic(() => import('weather-icons-react').then((mod) => mod.WiCloud), { ssr: false });
 const WiRain = dynamic(() => import('weather-icons-react').then((mod) => mod.WiRain), { ssr: false });
 const WiSnow = dynamic(() => import('weather-icons-react').then((mod) => mod.WiSnow), { ssr: false });
@@ -22,6 +23,7 @@ const WiFog = dynamic(() => import('weather-icons-react').then((mod) => mod.WiFo
 const getWeatherIcon = (iconName) => {
     switch (iconName) {
         case 'sunny': return <WiDaySunny size={28} />;
+        case 'partly-cloudy': return <WiDayCloudy size={28} />;
         case 'cloudy': return <WiCloud size={28} />;
         case 'rainy': return <WiRain size={28} />;
         case 'snowy': return <WiSnow size={28} />;
@@ -31,12 +33,14 @@ const getWeatherIcon = (iconName) => {
     }
 };
 
-const Header = ({ hideMiddleHeader = false, globalSettings }) => {
+const Header = ({ hideMiddleHeader = false, globalSettings, initialHeaderData = null }) => {
     const { locale } = useLanguage();
-    const [weather, setWeather] = useState({ temp: null, weatherCode: null, icon: 'cloudy' });
+    const [weather, setWeather] = useState(initialHeaderData?.headerWeather || { temp: null, weatherCode: null, icon: 'cloudy' });
     const [isSidebarActive, setSidebarActive] = useState(false);
     const [isOverlayActive, setOverlayActive] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [openMobileQuickDropdownKey, setOpenMobileQuickDropdownKey] = useState(null);
+    const [openMobileQuickSubmenuKey, setOpenMobileQuickSubmenuKey] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const router = useRouter();
     const path = usePathname()
@@ -51,18 +55,17 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
         setOverlayActive(false);
     };
 
-    const [currentDate, setCurrentDate] = useState('');
-    const [menuItems, setMenuItems] = useState([]);
-    const [isLoadingMenu, setIsLoadingMenu] = useState(true);
-    const [sidebarMenuItems, setSidebarMenuItems] = useState([]);
-    const [mobileMenuItems, setMobileMenuItems] = useState([]);
+    const [currentDate, setCurrentDate] = useState(initialHeaderData?.headerCurrentDate || '');
+    const [menuItems, setMenuItems] = useState(initialHeaderData?.headerMenuItems || []);
+    const [sidebarMenuItems, setSidebarMenuItems] = useState(initialHeaderData?.sidebarMenuItems || []);
+    const [mobileMenuItems, setMobileMenuItems] = useState(initialHeaderData?.mobileMenuItems || []);
     const [expandedSidebarItems, setExpandedSidebarItems] = useState({});
-    const [sidebarData, setSidebarData] = useState(null);
-    const [categoryTree, setCategoryTree] = useState([]);
+    const [sidebarData, setSidebarData] = useState(initialHeaderData?.sidebarData || null);
+    const [categoryTree, setCategoryTree] = useState(initialHeaderData?.categoryTree || []);
 
-    const [headerTopData, setHeaderTopData] = useState(null);
+    const [headerTopData, setHeaderTopData] = useState(initialHeaderData?.headerTopData || null);
     const [adsData, setAdsData] = useState(null);
-    const [headerLogo, setHeaderLogo] = useState(null);
+    const [headerLogo, setHeaderLogo] = useState(initialHeaderData?.headerLogo || null);
     const navbarNavRef = useRef(null);
 
     const hasWeatherTemp = weather.temp !== null && weather.temp !== undefined && !Number.isNaN(Number(weather.temp));
@@ -82,16 +85,47 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
     }, [locale]);
 
     useEffect(() => {
+        if (typeof window !== 'undefined') {
+            try {
+                const cachedHeaderMenu = window.localStorage.getItem(`headerMenu:${locale}`) || window.localStorage.getItem('headerMenu:last');
+                const cachedMobileMenu = window.localStorage.getItem(`mobileMenu:${locale}`) || window.localStorage.getItem('mobileMenu:last');
+
+                if (cachedHeaderMenu) {
+                    const parsedHeaderMenu = JSON.parse(cachedHeaderMenu);
+                    if (Array.isArray(parsedHeaderMenu) && parsedHeaderMenu.length > 0) {
+                        setMenuItems(parsedHeaderMenu);
+                    }
+                }
+
+                if (cachedMobileMenu) {
+                    const parsedMobileMenu = JSON.parse(cachedMobileMenu);
+                    if (Array.isArray(parsedMobileMenu) && parsedMobileMenu.length > 0) {
+                        setMobileMenuItems(parsedMobileMenu);
+                    }
+                }
+            } catch {
+            }
+        }
+
         // Fetch header menu items from the relocated structure
-        setIsLoadingMenu(true);
         getMenuItems('header', locale).then(res => {
-            setMenuItems(res?.data || []);
+            const headerMenuData = res?.data || [];
+            setMenuItems(headerMenuData);
             // Extract logo and mobile menu from header attributes
             const attrs = res?.attributes || {};
             if (attrs.logo) setHeaderLogo(getStrapiMedia(attrs.logo));
-            setMobileMenuItems(attrs.mobileMenu || []);
-        }).finally(() => {
-            setIsLoadingMenu(false);
+            const mobileMenuData = attrs.mobileMenu || [];
+            setMobileMenuItems(mobileMenuData);
+
+            if (typeof window !== 'undefined') {
+                try {
+                    window.localStorage.setItem(`headerMenu:${locale}`, JSON.stringify(headerMenuData));
+                    window.localStorage.setItem('headerMenu:last', JSON.stringify(headerMenuData));
+                    window.localStorage.setItem(`mobileMenu:${locale}`, JSON.stringify(mobileMenuData));
+                    window.localStorage.setItem('mobileMenu:last', JSON.stringify(mobileMenuData));
+                } catch {
+                }
+            }
         });
 
         // Fetch sidebar menu items
@@ -108,11 +142,11 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
         });
         
         const fetchHeaderWeather = async () => {
-            const ipCoords = await getIpLocation();
-            const lat = ipCoords?.lat;
-            const lon = ipCoords?.lon;
+            const coords = await resolveClientLocation(locale);
+            const lat = coords?.lat;
+            const lon = coords?.lon;
 
-            const data = await getCurrentWeather(lat, lon, locale);
+            const data = await getCurrentWeather(lat, lon, locale, { noCache: true });
             setWeather(data);
         };
 
@@ -125,7 +159,9 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
 
     useEffect(() => {
         // Set current date on mount to avoid hydration mismatch, including Bangla Date
-        setCurrentDate(formatDate(new Date().toISOString(), locale, true));
+        if (!currentDate) {
+            setCurrentDate(formatDate(new Date().toISOString(), locale, true));
+        }
 
         // Update document title and html lang when locale changes
         if (typeof document !== 'undefined') {
@@ -534,6 +570,142 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
         return currentDate;
     };
 
+    const fallbackMenuItems = categoryTree.slice(0, 10).map((cat) => ({
+        title: cat?.name || '',
+        url: cat?.slug ? `/${cat.slug}` : '#',
+    }));
+
+    const desktopMenuItems = menuItems.length > 0 ? menuItems : fallbackMenuItems;
+    const mobileNavItems = mobileMenuItems.length > 0 ? mobileMenuItems : desktopMenuItems;
+
+    const normalizeMenuUrl = (slug) => {
+        if (!slug) return '#';
+        return slug.startsWith('http') || slug === '#'
+            ? slug
+            : (slug.startsWith('/') ? slug : `/${slug}`);
+    };
+
+    const createQuickMenuEntry = (title, slug, openInNewTab, key) => {
+        if (!title) return null;
+        const url = normalizeMenuUrl(slug || '#');
+        return {
+            key,
+            title,
+            url,
+            openInNewTab: !!openInNewTab,
+            active: url !== '#' && path === url,
+        };
+    };
+
+    const extractDropdownPanelItems = (item, index) => {
+        const component = item.__component;
+        const data = item.attributes || item;
+
+        if (component === 'navigation.dropdown-menu') {
+            const subMenus = data.subMenus || [];
+            return subMenus.flatMap((sub, subIndex) => {
+                if (sub.__component === 'navigation.dropdown-header') {
+                    return [];
+                }
+
+                if (sub.__component === 'navigation.nested-dropdown') {
+                    const children = (sub.subMenus || []).map((nested, nestedIndex) =>
+                        createQuickMenuEntry(
+                            nested.title,
+                            nested.url || nested.slug,
+                            nested.openInNewTab,
+                            `mobile-quick-${index}-${subIndex}-${nestedIndex}`
+                        )
+                    ).filter(Boolean);
+
+                    if (children.length === 0) {
+                        return [];
+                    }
+
+                    return [{
+                        type: 'group',
+                        key: `mobile-quick-group-${index}-${subIndex}`,
+                        title: sub.title,
+                        children,
+                        active: children.some((child) => child.active),
+                    }];
+                }
+
+                return [{
+                    type: 'link',
+                    ...createQuickMenuEntry(
+                        sub.title,
+                        sub.url || sub.slug,
+                        sub.openInNewTab,
+                        `mobile-quick-${index}-${subIndex}`
+                    ),
+                }].filter(Boolean);
+            }).filter(Boolean);
+        }
+
+        if (component === 'navigation.mega-menu') {
+            return (data.sections || []).flatMap((section, sectionIndex) =>
+                (section.links || []).map((link, linkIndex) => ({
+                    type: 'link',
+                    ...createQuickMenuEntry(
+                        link.title,
+                        link.url || link.slug,
+                        link.openInNewTab,
+                        `mobile-quick-${index}-${sectionIndex}-${linkIndex}`
+                    ),
+                }))
+            ).filter(Boolean);
+        }
+
+        if (component === 'navigation.video-menu') {
+            return (data.videos || []).map((video, videoIndex) => ({
+                type: 'link',
+                ...createQuickMenuEntry(video.title, video.url || video.slug, video.openInNewTab, `mobile-quick-${index}-${videoIndex}`),
+            })).filter(Boolean);
+        }
+
+        return [];
+    };
+
+    const mobileQuickMenuItems = mobileNavItems
+        .map((item, index) => {
+            const component = item.__component;
+            const data = item.attributes || item;
+
+            if (!data?.title || component === 'navigation.menu-button') {
+                return null;
+            }
+
+            if (component === 'navigation.base-link' || !component) {
+                return {
+                    type: 'link',
+                    ...createQuickMenuEntry(data.title, data.url || data.slug, data.openInNewTab, `mobile-quick-${index}`),
+                };
+            }
+
+            const panelItems = extractDropdownPanelItems(item, index);
+
+            if (panelItems.length === 0) {
+                return {
+                    type: 'link',
+                    ...createQuickMenuEntry(data.title, data.url || data.slug, data.openInNewTab, `mobile-quick-${index}`),
+                };
+            }
+
+            return {
+                type: 'dropdown',
+                key: `mobile-quick-${index}`,
+                title: data.title,
+                panelItems,
+                active: panelItems.some((panelItem) => panelItem.active || panelItem.children?.some((child) => child.active)),
+            };
+        })
+        .filter(Boolean);
+
+    const activeMobileQuickDropdown = mobileQuickMenuItems.find(
+        (item) => item.type === 'dropdown' && item.key === openMobileQuickDropdownKey
+    );
+
     return (
         <>
             <header className={`main-header header-locale-${locale} home-nine`}>
@@ -748,24 +920,114 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                         </div>
                     </div>
                     <div className="container position-relative">
-                        <div className="d-md-none flex-grow-1 ps-2">
-                            <Link className="navbar-brand d-block mb-1" href="/">
+                        <div className="d-md-none flex-grow-1 ps-2 mobile-header-brand">
+                            <Link className="navbar-brand d-block mobile-header-brand__logo" href="/">
                                 <img 
                                     src={headerLogo || "/assets/images/logo.png"} 
                                     alt="Logo" 
-                                    style={{ width: '150px', height: '40px', objectFit: 'contain' }}
+                                    style={{ width: '136px', height: '34px', objectFit: 'contain' }}
                                 />
+                                {locale === 'bn' && (
+                                    <div className="mobile-logo-tagline">সত্যের সাথে, সত্যের পথে</div>
+                                )}
                             </Link>
                             <div className={`date-text-mobile fw-medium ${locale === 'bn' ? 'date-text-bn' : ''}`}>
                                 {renderDate()}
                             </div>
                         </div>
-                        <button type="button" className="btn btn-search_two  ms-auto ms-md-0 d-lg-none" onClick={handleSearchButtonClick}><i className="fa fa-search" /></button>
-                          
-                        <div className="d-lg-none ms-2"><ThemeChanger /></div>
-                        <button className={`navbar-toggler ms-1`} type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                            <span className="navbar-toggler-icon" />
-                        </button>
+                        <div className="d-lg-none ms-auto mobile-header-actions">
+                            <button type="button" className="btn btn-search_two ms-0" onClick={handleSearchButtonClick}><i className="fa fa-search" /></button>
+                            <div className="mobile-header-actions__theme"><ThemeChanger /></div>
+                            <button className="navbar-toggler ms-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                                <span className="navbar-toggler-icon" />
+                            </button>
+                        </div>
+                        {mobileQuickMenuItems.length > 0 && (
+                            <div className="d-lg-none mobile-quick-menu" aria-label="Mobile quick menu">
+                                <div className="mobile-quick-menu__bar">
+                                    {mobileQuickMenuItems.map((item) => (
+                                        item.type === 'dropdown' ? (
+                                            <div key={item.key} className="mobile-quick-menu__dropdown">
+                                                <button
+                                                    type="button"
+                                                    className={`mobile-quick-menu__link mobile-quick-menu__toggle ${item.active ? 'is-active' : ''}`}
+                                                    onClick={() => {
+                                                        setOpenMobileQuickDropdownKey((current) => {
+                                                            const nextKey = current === item.key ? null : item.key;
+                                                            setOpenMobileQuickSubmenuKey(null);
+                                                            return nextKey;
+                                                        });
+                                                    }}
+                                                    aria-expanded={openMobileQuickDropdownKey === item.key}
+                                                >
+                                                    {item.title}
+                                                    <i className={`fa-solid ${openMobileQuickDropdownKey === item.key ? 'fa-angle-up' : 'fa-angle-down'}`} />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <Link
+                                                key={item.key}
+                                                href={item.url}
+                                                target={item.openInNewTab ? '_blank' : '_self'}
+                                                className={`mobile-quick-menu__link ${item.active ? 'is-active' : ''}`}
+                                            >
+                                                {item.title}
+                                            </Link>
+                                        )
+                                    ))}
+                                </div>
+                                {activeMobileQuickDropdown && (
+                                    <div className="mobile-quick-menu__panel">
+                                        {activeMobileQuickDropdown.panelItems.map((panelItem) => (
+                                            panelItem.type === 'group' ? (
+                                                <div key={panelItem.key} className="mobile-quick-menu__group">
+                                                    <button
+                                                        type="button"
+                                                        className={`mobile-quick-menu__group-toggle ${panelItem.active ? 'is-active' : ''}`}
+                                                        onClick={() => setOpenMobileQuickSubmenuKey((current) => current === panelItem.key ? null : panelItem.key)}
+                                                        aria-expanded={openMobileQuickSubmenuKey === panelItem.key}
+                                                    >
+                                                        <span>{panelItem.title}</span>
+                                                        <i className={`fa-solid ${openMobileQuickSubmenuKey === panelItem.key ? 'fa-angle-down' : 'fa-angle-right'}`} />
+                                                    </button>
+                                                    {openMobileQuickSubmenuKey === panelItem.key && (
+                                                        <div className="mobile-quick-menu__group-panel">
+                                                            {panelItem.children.map((child) => (
+                                                                <Link
+                                                                    key={child.key}
+                                                                    href={child.url}
+                                                                    target={child.openInNewTab ? '_blank' : '_self'}
+                                                                    className={`mobile-quick-menu__child-link ${child.active ? 'is-active' : ''}`}
+                                                                    onClick={() => {
+                                                                        setOpenMobileQuickDropdownKey(null);
+                                                                        setOpenMobileQuickSubmenuKey(null);
+                                                                    }}
+                                                                >
+                                                                    {child.title}
+                                                                </Link>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <Link
+                                                    key={panelItem.key}
+                                                    href={panelItem.url}
+                                                    target={panelItem.openInNewTab ? '_blank' : '_self'}
+                                                    className={`mobile-quick-menu__panel-link ${panelItem.active ? 'is-active' : ''}`}
+                                                    onClick={() => {
+                                                        setOpenMobileQuickDropdownKey(null);
+                                                        setOpenMobileQuickSubmenuKey(null);
+                                                    }}
+                                                >
+                                                    {panelItem.title}
+                                                </Link>
+                                            )
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
                         <div className={`collapse navbar-collapse`} id="navbarSupportedContent">
                             <div className="align-items-center border-bottom d-flex d-lg-none  justify-content-between mb-3 navbar-collapse__header pb-3">
                                 <div className="collapse-brand flex-shrink-0">
@@ -786,17 +1048,11 @@ const Header = ({ hideMiddleHeader = false, globalSettings }) => {
                             
                             {/* Dynamic Menu Items */}
                             <ul className="navbar-nav" ref={navbarNavRef}>
-                                {isLoadingMenu ? (
-                                    <li className="nav-item"><span className="nav-link">Loading...</span></li>
-                                ) : (
-                                    <>
-                                        {/* Desktop Menu - Hidden on mobile */}
-                                        {menuItems.map((item, index) => renderMenuItem(item, index, "d-none d-lg-block"))}
-                                        
-                                        {/* Mobile Menu - Only shown on mobile view */}
-                                        {mobileMenuItems.map((item, index) => renderMenuItem(item, index, "d-lg-none"))}
-                                    </>
-                                )}
+                                {/* Desktop Menu - Hidden on mobile */}
+                                {desktopMenuItems.map((item, index) => renderMenuItem(item, index, "d-none d-lg-block"))}
+                                
+                                {/* Mobile Menu - Only shown on mobile view */}
+                                {mobileNavItems.map((item, index) => renderMenuItem(item, index, "d-lg-none"))}
                             </ul>
                         </div>
                         <div className="w-100 w-lg-auto d-none d-lg-flex">
