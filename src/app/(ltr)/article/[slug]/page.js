@@ -75,14 +75,12 @@ const ArticleDetailPage = async ({ params, searchParams }) => {
   const fetchLocale = isEnabled ? previewLocale : locale;
 
   try {
-    // Only fetch critical data on server
-    // Sidebar and ads can be fetched on client to avoid blocking initial render
     const results = await Promise.allSettled([
       articleFetcher(slug, fetchLocale),
     ]);
 
     articleData = results[0].status === 'fulfilled' ? results[0].value : null;
-    
+
     // Fetch non-critical data in parallel on client side
     // For now, provide empty defaults - client will fetch these
     mostViewedResponse = { data: [] };

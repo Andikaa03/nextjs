@@ -838,10 +838,15 @@ export default function Home({ initialData = null }) {
                             const catData = cat?.attributes || cat;
                             const slug = catData?.slug || '#';
                             const name = catData?.name || '...';
-                            const catImage = getStrapiMedia(catData?.featuredImage) || '/default.jpg';
+                            const rawImage = getStrapiMedia(catData?.featuredImage, null);
+                            const hasImage = !!rawImage;
                             return (
-                              <div key={cat?.id || `tt-${i}`} className="text-center mb-2 card-bg-scale position-relative overflow-hidden bg-dark-overlay bg-img p-3" data-image-src={catImage}>
-                                <Link href={slug !== '#' ? `/${slug}` : '#'} className="btn-link fs-5 fw-bold stretched-link text-decoration-none text-white">
+                              <div
+                                key={cat?.id || `tt-${i}`}
+                                className={`text-center mb-2 position-relative overflow-hidden p-3${hasImage ? ' card-bg-scale bg-dark-overlay bg-img' : ' trending-cat-fallback'}`}
+                                data-image-src={hasImage ? rawImage : undefined}
+                              >
+                                <Link href={slug !== '#' ? `/${slug}` : '#'} className="btn-link fs-5 fw-bold stretched-link text-decoration-none trending-cat-link">
                                   {name}
                                 </Link>
                               </div>

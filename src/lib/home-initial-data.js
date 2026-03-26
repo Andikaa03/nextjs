@@ -87,7 +87,9 @@ export async function getHomeInitialData(locale = "bn") {
 
     const latestFallback = latestRes.value?.data || [];
     const recentPostData = recentPostRes.value?.data;
+    const reviewData = reviewRes.value?.data;
     const initialLatest = recentPostData?.length > 0 ? recentPostData : latestFallback;
+    const initialLatestReviews = reviewData?.length > 0 ? reviewData : (recentPostData?.slice(0, 4) || latestFallback.slice(0, 4));
 
     let weatherData = {
       currentTemp: null,
@@ -138,7 +140,7 @@ export async function getHomeInitialData(locale = "bn") {
       tags: tagsRes.value?.data || [],
       techArticles: techRes.value?.data || [],
       editorPicks: editorRes.value?.data || [],
-      latestReviews: reviewRes.value?.data || [],
+      latestReviews: initialLatestReviews,
       adsData: adsRaw,
       categories: categoriesRes.value?.data || [],
       trendingCategories: trendingRes.value?.data || [],
