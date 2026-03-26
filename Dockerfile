@@ -12,7 +12,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-RUN npm run build
+RUN rm -rf /root/.cache/next-swc && npm run build
 
 FROM node:20-alpine AS runner
 
