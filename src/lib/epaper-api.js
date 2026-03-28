@@ -3,7 +3,7 @@ import qs from 'qs';
 
 /**
  * Get all ePaper entries, sorted newest first
- * Now populates the repeatable zones component and the related article
+ * Populates zones with their images
  */
 export async function getEpapers(locale = 'bn') {
   const strapiLocale = getStrapiLocale(locale);
@@ -13,27 +13,15 @@ export async function getEpapers(locale = 'bn') {
       image: true,
       zones: {
         populate: {
-          article: true
+          images: true
         }
       }
     },
-    sort: ['createdAt:desc'],
+    sort: ['publishDate:desc'],
     pagination: { pageSize: 100 },
   });
   const res = await fetchAPI(`/epapers?${query}`);
   return res?.data || [];
 }
 
-/**
- * Get a single ePaper article by slug
- */
-export async function getEpaperArticleBySlug(slug, locale = 'bn') {
-  const strapiLocale = getStrapiLocale(locale);
-  const query = qs.stringify({
-    locale: strapiLocale,
-    filters: { slug: { $eq: slug } },
-    populate: '*',
-  });
-  const res = await fetchAPI(`/epaper-articles?${query}`);
-  return res?.data?.[0] || null;
-}
+

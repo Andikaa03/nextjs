@@ -7344,7 +7344,7 @@ blockquote.no-sign p {
 
 [data-theme=skin-dark] html,
 [data-theme=skin-dark] body {
-    background-color: #141414;
+    background-color: var(--bs-body-bg);
 }
 
 /*color*/
