@@ -128,12 +128,12 @@ function PreviewBanner({ slug }) {
       fontWeight: 'bold',
       boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
     }}>
-      ⚠️ Mode Preview — Artikel ini belum dipublish.{' '}
+      ⚠️ Preview Mode — This article is not yet published.{' '}
       <a 
         href={`/api/disable-preview?slug=${slug}`}
         style={{ textDecoration: 'underline', marginLeft: '10px' }}
       >
-        Keluar dari Preview
+        Exit Preview
       </a>
     </div>
   );

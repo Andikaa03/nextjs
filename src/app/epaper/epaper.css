@@ -21,7 +21,6 @@
   border-bottom: 1px solid #e5e5e5;
   padding: 10px 0;
   position: relative; /* Normal flow, no sticky/fixed as per user request */
-  z-index: 50;
 }
 .epaper-root[data-dark="true"] .epaper-toolbar,
 [data-theme=skin-dark] .epaper-toolbar {
